@@ -182,3 +182,35 @@ Cette organisation apporte 4 grands avantages concrets pour le développeur :
     Réutilisabilité : La méthode chercherConflit() est stockée au même endroit. Elle peut être appelée par un site web, une application mobile ou une commande automatique.
 
     Tests simples : Vous pouvez tester toute votre application sans même avoir besoin d'allumer ou de configurer une base de données MySQL ou PostgreSQL.
+
+
+   **Questions Étape 8 — Implémenter les règles métier**
+
+1.​ Pourquoi ces règles ne sont-elles pas dans le contrôleur ?
+
+Ces regles ne sont pas dans le controller car il n'est pas de la responsabilité du controller le controller sont role est le request response pas de logique metier il orchestre les different composant 
+Le contrôleur a pour unique rôle de gérer le cycle Requête / Réponse HTTP (récupérer la requête, appeler le service, et retourner une vue HTML ou un JSON). En appliquant le Principe de Responsabilité Unique (SRP), la logique métier et les règles de gestion de réservation doivent être isolées dans la couche Service. Cela permet aussi de réutiliser ce service (par exemple via un appel API ou une commande CLI) sans repasser par un contrôleur Web.
+
+2.​ Pourquoi le service dépend-il d’une interface de Repository ?
+
+Le service depend d'une interface de repository car il a besoin de lui sil veut enregistrer ou recuperer des données deuis la base
+
+Le service dépend d'une interface (et non directement d'une classe SQL ou Eloquent) pour respecter le Principe d'Inversion de Dépendances (DIP - le "D" de SOLID). Le service exprime simplement ce dont il a besoin (findSalle, saveReservation) sans se soucier de comment les données sont stockées (Eloquent, SQL natif, API). Cela découple totalement le cœur métier du système de stockage.
+
+3.​ Quelle exception doit être levée en cas de conflit ?
+SalleIndisponibleException
+Lorsqu'il y a un chevauchement d'horaires sur un même créneau (conflit de réservation), ou que la salle est désactivée, le service de création doit lever la classe d'exception spécifique  créée : SalleIndisponibleException. Cela permet au contrôleur de savoir exactement que le problème vient de l'indisponibilité de la salle.
+
+4.​ Comment tester le service sans MySQL ?
+
+Comme le service dépend d'une interface (ReservationRepositoryInterface), on peut créer pour les tests une implémentation factice (souvent appelée un Mock ou un InMemoryReservationRepository). Cette classe implémente l'interface et stocke temporairement les réservations dans un simple tableau PHP en mémoire, ce qui permet de tester toute la logique du service instantanément sans allumer de vraie base de données MySQL.
+
+Petite résumé
+
+1. Les règles métier ne sont pas dans le contrôleur car son rôle est uniquement de gérer la requête et la réponse HTTP (Principe SRP). Mettre les règles dans un Service permet de séparer la logique applicative du Web et de la rendre réutilisable.
+
+2. Le service dépend d'une Interface de Repository pour respecter le principe d'inversion de dépendances (DIP). Le service n'a pas à être couplé à une technologie spécifique (Eloquent/MySQL), il exprime seulement le besoin de lire/écrire des données via un contrat.
+
+3. L'exception devant être levée en cas de conflit de créneau ou de salle inactive est SalleIndisponibleException.
+
+4. Pour tester le service sans MySQL, on peut créer une implémentation factice du Repository (Repository InMemory / Mock) qui enregistre les données dans un tableau PHP en mémoire au lieu d'une BDD.
