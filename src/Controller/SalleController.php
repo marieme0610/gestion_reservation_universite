@@ -70,7 +70,7 @@ class SalleController extends AbstractController
             $this->redirect('/salles/creer');
         }
 
-        $dto = CreerSalleDTO::fromArray($data);
+        $dto = CreerSalleDTO::fromArray($this->validator,$data);
 
         $_SESSION['success'] = "Salle enregistrée avec succès !";
         $this->redirect('/salles');

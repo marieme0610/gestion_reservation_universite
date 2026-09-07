@@ -5,10 +5,6 @@ require_once dirname(__DIR__) . "/config/bootstrap.php";
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Schema\Blueprint;
 
-Capsule::schema()->dropIfExists('reservations');
-Capsule::schema()->dropIfExists('salles');
-Capsule::schema()->dropIfExists('statut_reservation');
-Capsule::schema()->dropIfExists('type_salle');
 
 Capsule::schema()->create('type_salle', function (Blueprint $table) {
     $table->increments('id');

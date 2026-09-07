@@ -83,7 +83,7 @@ class ReservationController extends AbstractController
         }
 
         try {
-            $dto = CreerReservationDTO::fromArray($data);
+            $dto = CreerReservationDTO::fromArray($this->validator, $data);
             $reservationId = $this->creerReservationService->creatReservation($dto);
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
