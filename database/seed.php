@@ -17,7 +17,6 @@ try {
     $typeReun  = TypeSalle::firstOrCreate(['nom' => 'Réunion']);
     echo "Types de salles configurés.\n";
 
-    $enAttente = StatutReservation::firstOrCreate(['nom' => 'En attente']);
     $confirme  = StatutReservation::firstOrCreate(['nom' => 'Confirmée']);
     $annule    = StatutReservation::firstOrCreate(['nom' => 'Annulée']);
     echo "Statuts de réservation configurés.\n";
