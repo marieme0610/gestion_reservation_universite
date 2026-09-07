@@ -1,7 +1,8 @@
 <?php
 
 namespace App\DTO;
-
+use App\Validation\ValidatorInterface;
+use App\Exception\ValidationException;
 readonly class CreerSalleDTO
 {
     private function __construct(
@@ -12,14 +13,20 @@ readonly class CreerSalleDTO
         public int $typeSalleId
     ) {}
 
-    public static function fromArray(array $data): self
+    public static function fromArray(ValidatorInterface $validator,array $data): self
     {
+         $validationResult = $validator->validate($data);
+
+        if (!$validationResult->isValid()) {
+            throw new ValidationException($validationResult->errors());
+        }
+        $validatedData = $validationResult->data();
         return new self(
-            nom: (string) $data['nom'],
-            batiment: (string) $data['batiment'],
-            capacite: (int) $data['capacite'],
-            active: (bool) $data['active'],
-            typeSalleId: (int) $data['type_salle_id']
+            nom: (string) $validatedData['nom'],
+            batiment: (string) $validatedData['batiment'],
+            capacite: (int) $validatedData['capacite'],
+            active: (bool) $validatedData['active'],
+            typeSalleId: (int) $validatedData['type_salle_id']
         );
     }
 }
