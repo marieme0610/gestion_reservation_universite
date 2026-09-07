@@ -62,3 +62,31 @@ En base de données, la colonne active est stockée sous forme d'entier (TINYINT
 
 4. ​ Pourquoi convertir les dates en objets ?
 Les dates sont récupérées depuis la base de données sous forme de chaînes de caractères (string). En les castant en 'datetime', Eloquent les transforme automatiquement en objets Carbon / DateTime. Cela permet d'effectuer facilement des opérations avancées sur les dates (comparaisons, ajouts de jours, formatage d'affichage) sans devoir les parser manuellement.
+
+
+Questions
+1. ​ Quelle différence existe entre migration et seeder ?
+
+Migration : Définit et modifie la structure (le schéma) de la BDD (création/modification de tables, colonnes, clés étrangères).
+
+Seeding : Remplit la BDD avec du contenu (données de test ou données initiales indispensables comme les rôles, types de salles, statuts).
+
+2. ​ Pourquoi les données initiales doivent-elles être reproductibles ?
+
+Dire que les données doivent être reproductibles, cela veut dire que n'importe quel développeur (ou vous-même sur un nouveau PC ou sur le serveur de production) doit pouvoir reconstruire exactement la même base de données avec le même jeu de données en une seule commande (ex: php database/seed.php).
+
+Les raisons principales :
+
+    Travail en équipe : Tous les développeurs du projet travaillent avec les mêmes données de test (mêmes IDs, mêmes types de salles).
+
+    Environnement de test fiable : Les tests automatiques ou manuels donnent toujours le même résultat car ils partent du même état initial.
+
+    Déploiement facile : Quand le projet passe en production, on peut générer automatiquement les données de base obligatoires (ex: les statuts Confirmée, En attente) sans devoir les ressaisir à la main dans PhpMyAdmin.
+
+3. ​ Comment empêcher les doublons ?
+
+Au niveau PHP / ORM (Applicatif) :
+En utilisant firstOrCreate(['nom' => 'Amphithéâtre']). Eloquent vérifie d'abord si la ligne existe en BDD avant de l'insérer.
+
+Au niveau de la BDD (Structure) :
+En ajoutant la contrainte ->unique() sur la colonne dans la migration (ex: $table->string('code')->unique();), ce qui empêche techniquement MySQL d'accepter deux fois la même valeur.
