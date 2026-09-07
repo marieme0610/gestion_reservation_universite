@@ -1,0 +1,37 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../config/bootstrap.php';
+
+$command = $argv[1] ?? basename($argv[0]);
+$command = match ($command) {
+    'marieme:migrate' => 'migrate',
+    'marieme:seed' => 'seed',
+    default => $command,
+};
+
+if ($command === 'migrate') {
+    $files = glob(__DIR__ . '/../database/migrations/*.php');
+    sort($files);
+
+    foreach ($files as $file) {
+        $migration = require $file;
+        $migration->up();
+        echo "Migré : " . basename($file) . "\n";
+    }
+} elseif ($command === 'rollback') {
+    $files = glob(__DIR__ . '/../database/migrations/*.php');
+    rsort($files);
+
+    foreach ($files as $file) {
+        $migration = require $file;
+        $migration->down();
+        echo "Supprimé : " . basename($file) . "\n";
+    }
+} elseif ($command === 'seed') {
+    $seeder = require __DIR__ . '/../database/seeds/DatabaseSeeder.php';
+    $seeder->run();
+    echo "🌱 Seeding terminé avec succès !\n";
+} else {
+    echo "Usage : ./jean [migrate|rollback|seed]\n";
+}
