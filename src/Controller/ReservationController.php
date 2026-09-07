@@ -93,7 +93,8 @@ class ReservationController extends AbstractController
             $_SESSION['old'] = $data;
             $this->redirect('/reservations/create');
         } catch (Exception $e) {
-            $_SESSION['errors']['globale'] = $e->getMessage();
+            error_log($e->getMessage());
+            $_SESSION['errors']['globale'] = 'Une erreur est survenue lors de la réservation.';
             $_SESSION['old'] = $data;
             $this->redirect('/reservations/create');
         }

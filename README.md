@@ -218,6 +218,42 @@ php marieme:seed
 
 Les anciennes commandes restent disponibles : `php bin/App migrate`, `php bin/App seed` et `php bin/App rollback`.
 
+## Installation depuis un nouveau clone
+
+Prérequis : PHP 8.2 ou supérieur, Composer, PDO MySQL ou SQLite, et les extensions PHP utilisées par PHPUnit pour lancer les tests.
+
+```bash
+git clone <url-du-depot> gestionReservationUniversite
+cd gestionReservationUniversite
+composer install
+cp .env.example config/.env
+```
+
+Renseignez ensuite les paramètres de base de données dans `config/.env`, puis exécutez :
+
+```bash
+php marieme:migrate
+php marieme:seed
+php -S 127.0.0.1:8000 -t public
+```
+
+L'application est alors accessible à l'adresse `http://127.0.0.1:8000`.
+
+## Tests
+
+```bash
+vendor/bin/phpunit
+```
+
+Les tests utilisent SQLite en mémoire et des repositories en mémoire pour les tests unitaires. Ils ne modifient pas la base de développement.
+
+## Documentation technique
+
+Le diagramme des principales classes et dépendances se trouve dans [docs/class-diagram.md](docs/class-diagram.md).
+
+## Gestion des erreurs
+
+Les erreurs de validation sont conservées en session puis affichées dans le formulaire concerné. Les succès sont affichés après redirection. Les exceptions techniques sont journalisées côté serveur et présentent un message générique à l'utilisateur.
 
 **Questions Étape 10 — Configurer FastRoute**
 
@@ -255,7 +291,6 @@ Instancier le contrôleur.
 
 Appeler la méthode en lui passant les paramètres.
 
-
 **Questions Configurer PHP-DI**
 
 1.​ Quelle différence existe entre injection et conteneur ?
@@ -265,7 +300,6 @@ L’Injection de Dépendances (DI - Dependency Injection) : C’est un principe/
 Le Conteneur de Dépendances (DI Container) : C’est un outil / composant logiciel (ex: PHP-DI) chargé d'automatiser l'instanciation des objets et la résolution de leurs dépendances pour vous éviter de faire les new à la main dans tout le projet.
 
 En bref : L'injection est le concept architectural ; le conteneur est l'outil qui l'exécute automatiquement.
-
 
 2.​ Qu’est-ce que l’autowiring ?
 
