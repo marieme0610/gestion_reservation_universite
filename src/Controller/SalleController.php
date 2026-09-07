@@ -3,14 +3,16 @@
 namespace App\Controller;
 
 use App\DTO\CreerSalleDTO;
+use App\Model\Salle;
+use App\Model\TypeSalle;
 use App\Repository\SalleRepositoryInterface;
-use App\Validation\ValidatorInterface;
+use App\Validation\SalleValidator;
 
 class SalleController extends AbstractController
 {
     public function __construct(
         private SalleRepositoryInterface $salleRepository,
-        private ValidatorInterface $validator
+        private SalleValidator $validator
     ) {}
 
     public function index(): void
@@ -48,6 +50,7 @@ class SalleController extends AbstractController
 
         $this->renderView('salle/form', [
             'title'  => 'Créer une salle',
+            'types'  => TypeSalle::all(),
             'errors' => $errors,
             'old'    => $old
         ]);
@@ -67,10 +70,19 @@ class SalleController extends AbstractController
         if (!$validationResult->isValid()) {
             $_SESSION['errors'] = $validationResult->errors();
             $_SESSION['old']    = $data;
-            $this->redirect('/salles/creer');
+            $this->redirect('/salles/create');
         }
 
-        $dto = CreerSalleDTO::fromArray($this->validator,$data);
+        $dto = CreerSalleDTO::fromArray($this->validator, $data);
+        $salle = new Salle();
+        $salle->fill([
+            'nom' => $dto->nom,
+            'batiment' => $dto->batiment,
+            'capacite' => $dto->capacite,
+            'active' => $dto->active,
+            'type_salle_id' => $dto->typeSalleId,
+        ]);
+        $this->salleRepository->saveSalle($salle);
 
         $_SESSION['success'] = "Salle enregistrée avec succès !";
         $this->redirect('/salles');
@@ -86,14 +98,45 @@ class SalleController extends AbstractController
             return;
         }
 
+        $errors = $_SESSION['errors'] ?? [];
+        $old = $_SESSION['old'] ?? [];
+        unset($_SESSION['errors'], $_SESSION['old']);
+
         $this->renderView('salle/form', [
             'title' => "Modifier la salle {$salle->nom}",
-            'salle' => $salle
+            'types' => TypeSalle::all(),
+            'salle' => $salle,
+            'errors' => $errors,
+            'old' => $old,
         ]);
     }
 
     public function update(int $id): void
     {
+        $salle = $this->salleRepository->findSalle($id);
+        if (!$salle) {
+            http_response_code(404);
+            $this->renderView('error/404');
+            return;
+        }
+
+        $data = [
+            'nom' => trim($_POST['nom'] ?? ''),
+            'batiment' => trim($_POST['batiment'] ?? ''),
+            'capacite' => (int)($_POST['capacite'] ?? 0),
+            'active' => isset($_POST['active']),
+            'type_salle_id' => $_POST['type_salle_id'] ?? null,
+        ];
+
+        $validationResult = $this->validator->validate($data);
+        if (!$validationResult->isValid()) {
+            $_SESSION['errors'] = $validationResult->errors();
+            $_SESSION['old'] = $data;
+            $this->redirect("/salles/{$id}/edit");
+        }
+
+        $salle->fill($data);
+        $this->salleRepository->saveSalle($salle);
         $this->redirect('/salles');
     }
 }

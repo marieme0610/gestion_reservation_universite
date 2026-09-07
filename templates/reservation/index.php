@@ -1,6 +1,6 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Liste des Réservations</h1>
-    <a href="/reservations/creer" class="btn btn-primary">+ Nouvelle Réservation</a>
+    <a href="/reservations/create" class="btn btn-primary">+ Nouvelle Réservation</a>
 </div>
 
 <div class="card shadow-sm">
@@ -45,7 +45,7 @@
                                     <div class="btn-group btn-group-sm">
                                         <a href="/reservations/<?= e($reservation->id) ?>" class="btn btn-outline-info">Voir</a>
                                         <?php if ((int)$reservation->statut_reservation_id === 1): ?>
-                                            <form action="/reservations/annuler/<?= e($reservation->id) ?>" method="POST" class="d-inline" onsubmit="return confirm('Annuler cette réservation ?');">
+                                            <form action="/reservations/<?= e($reservation->id) ?>/cancel" method="POST" class="d-inline" onsubmit="return confirm('Annuler cette réservation ?');">
                                                 <button type="submit" class="btn btn-outline-danger">Annuler</button>
                                             </form>
                                         <?php endif; ?>

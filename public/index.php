@@ -1,13 +1,19 @@
 <?php
 
-use App\Router\Router;
 
-$container = require_once __DIR__ . '/../config/bootstrap.php';
+use App\Application;
+use DI\ContainerBuilder;
 
-$routesPath   = __DIR__ . '/../routes/web.php';
-$error404Path = __DIR__ . '/../templates/error/404.php';
-$error405Path = __DIR__ . '/../templates/error/405.php';
+require dirname(__DIR__) . '/vendor/autoload.php';
 
-$router = new Router($container, $routesPath, $error404Path, $error405Path);
-$router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
+$builder = new ContainerBuilder();
+$builder->addDefinitions(
+    dirname(__DIR__) . '/config/container.php'
+);
 
+$container = $builder->build();
+
+$container->get(Illuminate\Database\Capsule\Manager::class);
+
+$application = $container->get(Application::class);
+$application->run();

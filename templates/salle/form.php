@@ -1,3 +1,9 @@
+<?php
+$types = $types ?? [];
+$errors = $errors ?? [];
+$old = $old ?? [];
+?>
+
 <div class="row justify-content-center">
     <div class="col-md-6">
         <div class="card shadow-sm">
@@ -5,7 +11,20 @@
                 <h1 class="h4 mb-0"><?= isset($salle) ? 'Modifier la salle' : 'Créer une salle' ?></h1>
             </div>
             <div class="card-body">
-                <form action="<?= isset($salle) ? "/salles/modifier/{$salle->id}" : '/salles/creer' ?>" method="POST">
+                <form action="<?= isset($salle) ? "/salles/{$salle->id}/edit" : '/salles' ?>" method="POST">
+                    <div class="mb-3">
+                        <label for="type_salle_id" class="form-label">Type de salle</label>
+                        <select name="type_salle_id" id="type_salle_id" class="form-select <?= isset($errors['type_salle_id']) ? 'is-invalid' : '' ?>">
+                            <option value="">-- Sélectionner un type --</option>
+                            <?php foreach ($types as $type): ?>
+                                <option value="<?= e($type->id) ?>" <?= (string)($old['type_salle_id'] ?? $salle->type_salle_id ?? '') === (string)$type->id ? 'selected' : '' ?>><?= e($type->nom) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if (isset($errors['type_salle_id'])): ?>
+                            <div class="invalid-feedback"><?= e($errors['type_salle_id']) ?></div>
+                        <?php endif; ?>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label">Nom de la salle</label>
                         <input type="text" name="nom" class="form-control <?= isset($errors['nom']) ? 'is-invalid' : '' ?>" value="<?= e($old['nom'] ?? $salle->nom ?? '') ?>">
