@@ -11,7 +11,7 @@
 Ces paquets ne sont pas installés sur le serveur de production lorsqu'on exécute la commande composer install --no-dev.
 
  3. ​ Pourquoi faut-il versionner composer.lock ?
-* Le fichier composer.lock gèle (lock) les versions exactes de toutes les dépendances (et sous-dépendances) installées à un instant $T$. Le versionner garantit que tous les développeurs de l'équipe ainsi que le serveur de production utilisent strictement le même environnement de code, évitant le problème du "ça marche sur ma machine mais pas en prod".
+* Le fichier composer.lock gèle (lock) les versions exactes de toutes les dépendances (et sous-dépendances) installées à un instant $T$. Le versionner garantit que tous les développeurs de l'équipe ainsi que le serveur de production utilisent strictement le même environnement de code, évitant le problème du ça marche sur ma machine mais pas en prod.
 
 4. ​Pourquoi ne versionne-t-on pas vendor/ ?
 * Poids du dépôt Git : Télécharger des Mo/Go de code tiers alourdit inutilement l'historique du projet.Redondance : Les fichiers composer.json et composer.lock contiennent déjà toutes les instructions nécessaires pour régénérer le dossier vendor/ à l'identique à l'aide d'une simple commande (composer install).
@@ -38,3 +38,27 @@ Le démarrage de l'ORM (bootEloquent()) doit se trouver au tout début du cycle 
     Gestion des relations : En SQL pur, il faut écrire soi-même des requêtes avec des jointures (JOIN) parfois longues et complexes. L'ORM simplifie cela en vous permettant de déclarer des méthodes de relation (belongsTo, hasMany) et de les appeler directement sous forme de propriétés (ex. $reservation->salle).
 
     Productivité et sécurité : L'ORM accélère considérablement le développement en évitant d'écrire des requêtes répétitives et protège nativement contre les injections SQL grâce à la préparation automatique de toutes les requêtes.
+
+
+
+    **Questions Créer les modèles**
+    
+    1. ​ Quel type de relation Eloquent avez-vous utilisé ?
+
+J'ai utilisé deux types de relations Eloquent :
+
+    belongsTo (Un-à-Un / Plusieurs-à-Un) dans Salle (vers TypeSalle) et dans Reservation (vers Salle et StatutReservation), car la clé étrangère se trouve dans ces tables.
+
+    hasMany (Un-à-Plusieurs) dans TypeSalle, StatutReservation et Salle (vers Reservation), car un enregistrement parent peut être lié à plusieurs enregistrements enfants.
+
+2. ​ Pourquoi déclarer $fillable ou $guarded ?
+On déclare $fillable (ou $guarded) par mesure de sécurité contre les failles d'assignation en masse (Mass Assignment). $fillable sert de liste blanche : il autorise uniquement les attributs spécifiés à être remplis lors d'une création ou mise à jour via un tableau (ex: Salle::create($donnees)), empêchant un utilisateur de modifier des champs sensibles non autorisés.
+
+Alors que $fillable fonctionne comme une liste blanche, $guarded fonctionne comme une liste noire. On l'utilise pour spécifier uniquement les attributs qui sont strictement interdits d'être remplis lors d'une assignation en masse (Mass Assignment). Tous les autres attributs absents de cette liste seront alors autorisés par défaut.
+
+
+3. ​ Pourquoi convertir active en booléen ?
+En base de données, la colonne active est stockée sous forme d'entier (TINYINT 0 ou 1). Le cast 'active' => 'boolean' permet à Eloquent de la convertir automatiquement en un véritable booléen PHP (true ou false). Cela simplifie les conditions logiques dans le code (ex: if ($salle->active)) et garantit le typage strict.
+
+4. ​ Pourquoi convertir les dates en objets ?
+Les dates sont récupérées depuis la base de données sous forme de chaînes de caractères (string). En les castant en 'datetime', Eloquent les transforme automatiquement en objets Carbon / DateTime. Cela permet d'effectuer facilement des opérations avancées sur les dates (comparaisons, ajouts de jours, formatage d'affichage) sans devoir les parser manuellement.
