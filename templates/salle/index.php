@@ -4,7 +4,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="h3 mb-0">Salles de cours</h1>
-    <a href="/salles/creer" class="btn btn-success">+ Nouvelle Salle</a>
+    <a href="/salles/create" class="btn btn-success">+ Nouvelle Salle</a>
 </div>
 
 <div class="row">
@@ -26,7 +26,7 @@
                 </div>
                 <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
                     <a href="/salles/<?= e($salle->id) ?>" class="btn btn-sm btn-outline-primary">Détails</a>
-                    <a href="/salles/modifier/<?= e($salle->id) ?>" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    <a href="/salles/<?= e($salle->id) ?>/edit" class="btn btn-sm btn-outline-secondary">Modifier</a>
                 </div>
             </div>
         </div>

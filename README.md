@@ -217,3 +217,78 @@ php marieme:seed
 ```
 
 Les anciennes commandes restent disponibles : `php bin/App migrate`, `php bin/App seed` et `php bin/App rollback`.
+
+
+**Questions Étape 10 — Configurer FastRoute**
+
+1.​ Pourquoi FastRoute ne construit-il pas lui-même le contrôleur ?
+
+FastRoute respecte le principe de responsabilité unique (Single Responsibility Principle). Son seul rôle est d'analyser l'URL demandée pour déterminer quelle route correspond et de renvoyer le handler associé (ex: ['App\Controller\SalleController', 'show']).
+
+Il ne sait pas comment instancier vos classes ni quelles dépendances leur injecter (ex: injection de dépendances / conteneur PSR-11).
+
+Il reste ainsi complètement indépendant de votre architecture logicielle ou de votre framework.
+
+2.​ Quelle différence existe entre 404 et 405 ?
+
+404 Not Found : L'URI demandée n'existe tout simplement pas dans le système de routage, quel que soit le verbe HTTP utilisé (ex: GET /page-inexistante).
+
+405 Method Not Allowed : L'URI existe dans vos routes, mais pas avec le verbe HTTP envoyé. Par exemple, si la route /salles accepte GET et POST, mais qu'un client essaie d'envoyer une requête DELETE /salles, FastRoute renvoie un code 405 (souvent accompagné de la liste des méthodes autorisées : GET, POST).
+
+3.​ Pourquoi contraindre {id} avec \d+ ?
+
+Contraindre un paramètre avec une expression régulière comme \d+ (qui signifie « un ou plusieurs chiffres ») sert à :
+
+Prévenir les erreurs de type : Cela garantit au contrôleur que le paramètre transmis est strictement un nombre entier positif, évitant d'exécuter des requêtes SQL inutiles avec des chaînes de caractères (ex: /salles/abc).
+
+Éviter les conflits de routes : Si vous avez une route /salles/{id:\d+} et une autre route /salles/export, l'URL /salles/export ne sera pas capturée par la route {id} car "export" ne respecte pas le motif \d+.
+
+4.​ Quel composant doit interpréter le handler retourné ?
+
+C'est le Dispatcher (ou le Front Controller / Routeur applicatif).
+
+Dans votre application (généralement dans public/index.php), le Dispatcher récupère le résultat de FastRoute\dispatcher(...) et utilise la structure de contrôle (switch / match) sur le statut retourné (FOUND) pour :
+
+Extraire la classe et la méthode du handler.
+
+Instancier le contrôleur.
+
+Appeler la méthode en lui passant les paramètres.
+
+
+**Questions Configurer PHP-DI**
+
+1.​ Quelle différence existe entre injection et conteneur ?
+
+L’Injection de Dépendances (DI - Dependency Injection) : C’est un principe/design pattern de conception orientée objet. Il consiste à passer (injecter) à une classe les objets dont elle a besoin pour fonctionner (généralement via son constructeur), au lieu de laisser la classe les créer elle-même (new).
+
+Le Conteneur de Dépendances (DI Container) : C’est un outil / composant logiciel (ex: PHP-DI) chargé d'automatiser l'instanciation des objets et la résolution de leurs dépendances pour vous éviter de faire les new à la main dans tout le projet.
+
+En bref : L'injection est le concept architectural ; le conteneur est l'outil qui l'exécute automatiquement.
+
+
+2.​ Qu’est-ce que l’autowiring ?
+
+L'autowiring (ou auto-câblage) est une fonctionnalité du conteneur qui analyse les types de paramètres demandés dans le constructeur d'une classe (via la réflexivité de PHP) pour instancier et injecter automatiquement les dépendances requises, sans qu'il soit nécessaire de les configurer à la main une par une.
+
+3.​ Pourquoi les interfaces nécessitent-elles une définition ?
+
+Une interface est un contrat abstrait : elle ne peut pas être instanciée directement avec un new.
+
+Lorsque l'autowiring lit un constructeur demandant SalleRepositoryInterface, le conteneur ne peut pas savoir quelle classe concrète instancier (ex: EloquentSalleRepository, SqliteSalleRepository ou InMemorySalleRepository). Une définition explicite est donc obligatoire dans container.php pour associer chaque interface à son implémentation concrète.
+
+4.​ Pourquoi limiter $container->get() au point d’entrée ?
+
+Limiter l'appel direct à $container->get() au point d'entrée de l'application (comme public/index.php) garantit que le conteneur reste un orchestrateur externe et ne pollue pas la logique métier de votre application.
+
+Une fois l'application démarrée, le conteneur résout et injecte automatiquement la chaîne complète de dépendances de manière transparente.
+
+5.​ Quel anti-pattern apparaît si toutes les classes interrogent le conteneur ?
+
+L'anti-pattern qui apparaît est le Service Locator (Localisateur de Services).
+
+Si une classe reçoit le $container et fait $this->container->get(...) à l'intérieur de ses méthodes :
+
+    Les dépendances deviennent cachées : En lisant le constructeur de la classe, on ne sait plus de quoi elle a réellement besoin pour fonctionner.
+
+    Le couplage devient fort : La classe devient dépendante du conteneur lui-même, ce qui rend la classe impossible à tester unitairement ou à réutiliser sans embarquer le conteneur.

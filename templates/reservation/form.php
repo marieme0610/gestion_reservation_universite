@@ -9,7 +9,7 @@
                 <h1 class="h4 mb-0 text-primary">Réserver une salle</h1>
             </div>
             <div class="card-body">
-                <form action="/reservations/creer" method="POST" novalidate>
+                <form action="/reservations" method="POST" novalidate>
 
                     <!-- Choix de la Salle -->
                     <div class="mb-3">

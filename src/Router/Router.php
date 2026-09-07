@@ -34,7 +34,6 @@ class Router
 
         $routesDefinition = require $this->routesPath;
         $dispatcher = simpleDispatcher($routesDefinition);
-
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 
         switch ($routeInfo[0]) {
@@ -44,21 +43,15 @@ class Router
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
                 http_response_code(405);
-                header('Allow: ' . implode(', ', $allowedMethods));
+                header('Allow: ' . implode(', ', $routeInfo[1]));
                 require $this->error405Path;
                 break;
 
             case Dispatcher::FOUND:
                 [$controllerClass, $method] = $routeInfo[1];
-                $vars = $routeInfo[2];
-
-                $controller = $this->container 
-                    ? $this->container->get($controllerClass) 
-                    : new $controllerClass();
-
-                call_user_func_array([$controller, $method], array_values($vars));
+                $controller = $this->container?->get($controllerClass) ?? new $controllerClass();
+                $controller->$method(...array_values($routeInfo[2]));
                 break;
         }
     }

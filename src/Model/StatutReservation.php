@@ -1,18 +1,20 @@
 <?php
 
 namespace App\Model;
+
 use Illuminate\Database\Eloquent\Model;
 
-class StatutReservation extends Model{
+class StatutReservation extends Model
+{
 
-   protected $table = 'statut_reservation';
+    protected $table = 'statut_reservation';
 
-   public $timestamps = false;
+    public $timestamps = false;
 
-   protected $fillable = ['nom'];
+    protected $fillable = ['nom'];
 
-    public function reservations(){
-        $this->hasMany(Reservation::class,'statut_reservation_id');
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class, 'statut_reservation_id');
     }
 }
-

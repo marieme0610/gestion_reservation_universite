@@ -7,7 +7,7 @@ use App\Service\CreerReservationService;
 use App\Service\AnnulerReservationService;
 use App\Repository\ReservationRepositoryInterface;
 use App\Repository\SalleRepositoryInterface;
-use App\Validation\ValidatorInterface;
+use App\Validation\ReservationValidator;
 use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationIntrouvableException;
 use Exception;
@@ -19,7 +19,7 @@ class ReservationController extends AbstractController
         private SalleRepositoryInterface $salleRepository,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
-        private ValidatorInterface $validator
+        private ReservationValidator $validator
     ) {}
 
     public function index(): void
@@ -79,7 +79,7 @@ class ReservationController extends AbstractController
         if (!$validationResult->isValid()) {
             $_SESSION['errors'] = $validationResult->errors();
             $_SESSION['old']    = $data;
-            $this->redirect('/reservations/creer');
+            $this->redirect('/reservations/create');
         }
 
         try {
@@ -88,15 +88,14 @@ class ReservationController extends AbstractController
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
             $this->redirect('/reservations');
-
         } catch (SalleIndisponibleException $e) {
             $_SESSION['errors']['globale'] = $e->getMessage();
             $_SESSION['old'] = $data;
-            $this->redirect('/reservations/creer');
+            $this->redirect('/reservations/create');
         } catch (Exception $e) {
             $_SESSION['errors']['globale'] = $e->getMessage();
             $_SESSION['old'] = $data;
-            $this->redirect('/reservations/creer');
+            $this->redirect('/reservations/create');
         }
     }
 

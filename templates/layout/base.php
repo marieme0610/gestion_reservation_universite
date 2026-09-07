@@ -1,11 +1,16 @@
+<?php
+$errors = $errors ?? [];
+?>
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Système de Réservation de Salles') ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body class="bg-light">
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
@@ -14,7 +19,7 @@
             <div class="navbar-nav">
                 <a class="nav-link" href="/salles">Salles</a>
                 <a class="nav-link" href="/reservations">Réservations</a>
-                <a class="nav-link btn btn-outline-light ms-2 text-white" href="/reservations/creer">+ Réserver</a>
+                <a class="nav-link btn btn-outline-light ms-2 text-white" href="/reservations/create">+ Réserver</a>
             </div>
         </div>
     </nav>
@@ -29,7 +34,7 @@
         <?php endif; ?>
 
         <!-- Erreur globale métier (ex: SalleIndisponibleException) -->
-        <?php if (!empty($errors['globale'])): ?>
+        <?php if (!empty($errors['globale'] ?? null)): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Erreur :</strong> <?= e($errors['globale']) ?>
             </div>
@@ -47,4 +52,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
