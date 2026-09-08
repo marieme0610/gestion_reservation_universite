@@ -317,6 +317,47 @@ Limiter l'appel direct à $container->get() au point d'entrée de l'application 
 
 Une fois l'application démarrée, le conteneur résout et injecte automatiquement la chaîne complète de dépendances de manière transparente.
 
+## Exécution avec Docker
+
+Prérequis : Docker avec le plugin Docker Compose.
+
+Construire et démarrer le conteneur PHP CLI ainsi que MySQL :
+
+```bash
+GIT_COMMIT=$(git rev-parse HEAD) docker compose up -d --build
+```
+
+Le SHA Git est enregistré dans la métadonnée `org.opencontainers.image.revision` de l'image afin d'identifier précisément le commit livré.
+
+Le dossier `.git` est également conservé dans l'image. Les tags Git du dépôt sont donc disponibles dans `/app` avec `git tag`.
+
+Initialiser la base de données dans le conteneur PHP :
+
+```bash
+docker compose exec app php marieme:migrate
+docker compose exec app php marieme:seed
+```
+
+Le projet n'utilise pas encore de serveur web dans Docker. MySQL est accessible par le nom de service `db` depuis le conteneur PHP. Les données sont conservées dans le volume Docker `mysql-data`.
+
+Le code du projet est copié dans `/app` dans le conteneur. Pour exécuter une commande PHP :
+
+```bash
+docker compose exec app php -v
+```
+
+Arrêter les services :
+
+```bash
+docker compose down
+```
+
+Supprimer également les données MySQL :
+
+```bash
+docker compose down -v
+```
+
 5.​ Quel anti-pattern apparaît si toutes les classes interrogent le conteneur ?
 
 L'anti-pattern qui apparaît est le Service Locator (Localisateur de Services).

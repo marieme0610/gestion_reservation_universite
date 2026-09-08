@@ -9,7 +9,6 @@ use App\Repository\SalleRepositoryInterface;
 
 final class InMemorySalleRepository implements SalleRepositoryInterface
 {
-    /** @var array<int, Salle> */
     private array $salles = [];
 
     public function getAllSalle(): array

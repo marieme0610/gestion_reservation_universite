@@ -10,7 +10,6 @@ use DateTimeImmutable;
 
 final class InMemoryReservationRepository implements ReservationRepositoryInterface
 {
-    /** @var array<int, Reservation> */
     private array $reservations = [];
 
     public function getAllReservation(): array
