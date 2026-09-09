@@ -21,8 +21,8 @@ class Reservation extends Model{
     protected $casts = [
         'salle_id' => 'int' ,
         'statut_reservation_id' => 'int',
-        'date_debut' => 'dateTime',
-        'date_fin'  => 'dateTime'
+        'date_debut' => 'datetime',
+        'date_fin'  => 'datetime'
     ];
 
     //  public function salles(){
