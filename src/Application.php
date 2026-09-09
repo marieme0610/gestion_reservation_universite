@@ -32,13 +32,13 @@ final class Application
             switch ($routeInfo[0]) {
                 case Dispatcher::NOT_FOUND:
                     http_response_code(404);
-                    require dirname(__DIR__) . '/templates/error/404.php';
+                    $this->renderErrorPage('error/404.php');
                     break;
 
                 case Dispatcher::METHOD_NOT_ALLOWED:
                     http_response_code(405);
                     header('Allow: ' . implode(', ', $routeInfo[1]));
-                    require dirname(__DIR__) . '/templates/error/405.php';
+                    $this->renderErrorPage('error/405.php');
                     break;
 
                 case Dispatcher::FOUND:
@@ -52,7 +52,23 @@ final class Application
         } catch (\Throwable $exception) {
             error_log((string) $exception);
             http_response_code(500);
-            require dirname(__DIR__) . '/templates/error/500.php';
+            $this->renderErrorPage('error/500.php');
+        }
+    }
+
+    private function renderErrorPage(string $template): void
+    {
+        $templatePath = dirname(__DIR__) . '/templates/' . $template;
+        $layoutPath = dirname(__DIR__) . '/templates/layout/base.php';
+
+        ob_start();
+        require $templatePath;
+        $content = ob_get_clean();
+
+        if (file_exists($layoutPath)) {
+            require $layoutPath;
+        } else {
+            echo $content;
         }
     }
 }

@@ -9,6 +9,7 @@ use App\Repository\ReservationRepositoryInterface;
 use App\Repository\SalleRepositoryInterface;
 use App\Validation\ReservationValidator;
 use App\Exception\SalleIndisponibleException;
+use App\Exception\ReservationInvalideException;
 use App\Exception\ReservationIntrouvableException;
 use Exception;
 
@@ -26,9 +27,13 @@ class ReservationController extends AbstractController
     {
         $reservations = $this->reservationRepository->getAllReservation();
 
+        $errors = $_SESSION['errors'] ?? [];
+        unset($_SESSION['errors']);
+
         $this->renderView('reservation/index', [
             'title'        => 'Liste des réservations',
-            'reservations' => $reservations
+            'reservations' => $reservations,
+            'errors'       => $errors,
         ]);
     }
 
@@ -88,7 +93,7 @@ class ReservationController extends AbstractController
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
             $this->redirect('/reservations');
-        } catch (SalleIndisponibleException $e) {
+        } catch (SalleIndisponibleException | ReservationInvalideException $e) {
             $_SESSION['errors']['globale'] = $e->getMessage();
             $_SESSION['old'] = $data;
             $this->redirect('/reservations/create');

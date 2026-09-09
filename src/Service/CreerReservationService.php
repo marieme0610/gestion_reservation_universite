@@ -7,8 +7,8 @@ use App\DTO\CreerReservationDTO;
 use App\Repository\ReservationRepositoryInterface;
 use App\Repository\SalleRepositoryInterface;
 use App\Exception\SalleIndisponibleException;
+use App\Exception\ReservationInvalideException;
 use DateTimeImmutable;
-use Exception;
 
 class CreerReservationService
 {
@@ -28,30 +28,30 @@ class CreerReservationService
 
         $salle = $this->salleRepository->findSalle($salle_id);
         if (!$salle) {
-            throw new Exception("Salle introuvable.");    
+            throw new ReservationInvalideException("Salle introuvable.");
         }
 
         if (!$salle->active) {
-            throw new SalleIndisponibleException("Cette salle est inactive.");    
+            throw new SalleIndisponibleException("Cette salle est inactive.");
         }
-           
+
         if ($debut >= $fin) {
-            throw new Exception("La date de début doit être strictement antérieure à la date de fin.");  
+            throw new ReservationInvalideException("La date de début doit être strictement antérieure à la date de fin.");
         }
-        
+
         $duree = $fin->getTimestamp() - $debut->getTimestamp();
         if ($duree > 14400) {
-            throw new Exception("La durée d'une réservation ne peut pas dépasser 4 heures.");  
+            throw new ReservationInvalideException("La durée d'une réservation ne peut pas dépasser 4 heures.");
         }
-        
+
         $maintenant = new DateTimeImmutable();
         if ($debut <= $maintenant) {
-            throw new Exception("La date de réservation doit être dans le futur.");  
+            throw new ReservationInvalideException("La date de réservation doit être dans le futur.");
         }
 
         $conflit = $this->reservationRepository->chercherConflit($salle_id, $debut, $fin);
         if ($conflit) {
-            throw new SalleIndisponibleException("La salle est déjà réservée sur ce créneau horaire.");  
+            throw new SalleIndisponibleException("La salle est déjà réservée sur ce créneau horaire.");
         }
 
         $newReservation = new Reservation();
@@ -64,5 +64,5 @@ class CreerReservationService
         $newReservation->date_fin = $fin->format('Y-m-d H:i:s');
 
         return $this->reservationRepository->saveReservation($newReservation);
-    }       
+    }
 }
