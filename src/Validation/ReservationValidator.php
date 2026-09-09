@@ -15,7 +15,7 @@ class ReservationValidator implements ValidatorInterface
         $rules = [
             'salle_id'              => v::key('salle_id', v::intVal()->positive(), true),
             'responsable'           => v::key('responsable', v::stringType()->length(2, 120), true),
-            'motif'                 => v::key('motif', v::stringType()->length(5, 255), false),
+            'motif'                 => v::key('motif', v::stringType()->length(5, 255), true),
             'email'                 => v::key('email', v::email(), true),
             'date_debut'            => v::key('date_debut', v::dateTime(), true),
             'date_fin'              => v::key('date_fin', v::dateTime(), true),
