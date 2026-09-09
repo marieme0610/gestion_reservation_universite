@@ -1,5 +1,12 @@
 {
     "name": "marieme/gestion-reservation-universite",
+    "description": "Application PHP de gestion des réservations de salles universitaires.",
+    "license": "proprietary",
+    "config": {
+        "platform": {
+            "php": "8.3.6"
+        }
+    },
     "autoload": {
         "psr-4": {
             "App\\": "src/"

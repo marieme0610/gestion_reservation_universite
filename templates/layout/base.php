@@ -8,6 +8,7 @@ $errors = $errors ?? [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Système de Réservation de Salles') ?></title>
+    <link rel="stylesheet" href="/assets/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -37,6 +38,12 @@ $errors = $errors ?? [];
         <?php if (!empty($errors['globale'] ?? null)): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <strong>Erreur :</strong> <?= e($errors['globale']) ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($errors) && empty($errors['globale'])): ?>
+            <div class="alert alert-danger" role="alert">
+                <strong>Veuillez corriger les champs signalés.</strong>
             </div>
         <?php endif; ?>
 
