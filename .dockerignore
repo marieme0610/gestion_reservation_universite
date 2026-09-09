@@ -1,0 +1,13 @@
+.gitignore
+vendor/
+config/.env
+.env
+.env.\*
+composer-cache/
+
+Dockerfile
+docker-compose.yml
+README.md
+CHANGELOG.md
+docs/
+tests/
