@@ -82,6 +82,7 @@ class ReservationController extends AbstractController
         ];
 
         $validationResult = $this->validator->validate($data);
+
         if (!$validationResult->isValid()) {
             $_SESSION['errors'] = $validationResult->errors();
             $_SESSION['old']    = $data;
@@ -96,7 +97,9 @@ class ReservationController extends AbstractController
                 ->motif($data['motif'])
                 ->dateDebut($data['date_debut'])
                 ->dateFin($data['date_fin'])
-                ->build($this->validator);            $reservationId = $this->creerReservationService->creatReservation($dto);
+                ->build($this->validator);            
+                
+                $reservationId = $this->creerReservationService->creatReservation($dto);
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
             $this->redirect('/reservations');

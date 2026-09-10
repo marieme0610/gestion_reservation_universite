@@ -4,13 +4,7 @@ namespace App\DTO;
 
 use App\Validation\ValidatorInterface;
 
-/**
- * Builder : assemble étape par étape les données brutes d'une réservation
- * avant de les soumettre à la validation. Les setters acceptent des valeurs
- * "mixed" volontairement : à ce stade rien n'est encore validé (une date
- * mal formée ou un champ vide doivent produire une erreur de validation
- * propre, pas une erreur PHP fatale avant même d'arriver au validateur).
- */
+
 class CreerReservationBuilder
 {
     private function __construct(
