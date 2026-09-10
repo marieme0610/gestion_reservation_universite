@@ -4,16 +4,16 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8000"
+      - "${APP_PORT:-8080}:8000"
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
       DB_DRIVER: mysql
       DB_HOST: db
       DB_PORT: "3306"
-      DB_DATABASE: reservation_salles
-      DB_USERNAME: reservation_user
-      DB_PASSWORD: reservation_password
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     depends_on:
       db:
         condition: service_healthy
@@ -23,10 +23,10 @@ services:
   db:
     image: mysql:8.0
     environment:
-      MYSQL_DATABASE: reservation_salles
-      MYSQL_USER: reservation_user
-      MYSQL_PASSWORD: reservation_password
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -38,8 +38,8 @@ services:
           "-h",
           "localhost",
           "-u",
-          "reservation_user",
-          "-preservation_password",
+          "${DB_USERNAME}",
+          "-p${DB_PASSWORD}",
         ]
       interval: 5s
       timeout: 5s
@@ -51,10 +51,10 @@ services:
     image: phpmyadmin:5
     environment:
       PMA_HOST: db
-      PMA_USER: reservation_user
-      PMA_PASSWORD: reservation_password
+      PMA_USER: ${DB_USERNAME}
+      PMA_PASSWORD: ${DB_PASSWORD}
     ports:
-      - "8081:80"
+      - "${PHPMYADMIN_PORT:-8081}:80"
     depends_on:
       db:
         condition: service_healthy
