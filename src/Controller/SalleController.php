@@ -2,26 +2,22 @@
 
 namespace App\Controller;
 
-use App\DTO\CreerSalleDTO;
-use App\Model\Salle;
-use App\Model\TypeSalle;
-use App\Repository\SalleRepositoryInterface;
+use App\Service\SalleService;
 use App\Validation\SalleValidator;
 use App\DTO\CreerSalleBuilder;
-use App\Factory\SalleFactory;
 use App\Rendering\ResponseRendererInterface;
 
 class SalleController extends AbstractController
 {
-        public function __construct(
-        private SalleRepositoryInterface $salleRepository,
+    public function __construct(
+        private SalleService $salleService,
         private SalleValidator $validator,
         ResponseRendererInterface $renderer
     ) {
         parent::__construct($renderer);
     }
 
-        public function index(): void
+    public function index(): void
     {
         $criteres = [
             'nom'           => trim($_GET['nom'] ?? ''),
@@ -29,20 +25,20 @@ class SalleController extends AbstractController
         ];
         $page = max(1, (int) ($_GET['page'] ?? 1));
 
-        $pagination = $this->salleRepository->rechercherEtPaginer($criteres, $page, 5);
+        $pagination = $this->salleService->rechercherEtPaginer($criteres, $page, 5);
 
         $this->renderView('salle/index', [
             'title'      => 'Liste des salles',
             'salles'     => $pagination->items,
             'pagination' => $pagination,
             'criteres'   => $criteres,
-            'types'      => TypeSalle::all(),
+            'types'      => $this->salleService->listerTypes(),
         ]);
     }
 
     public function show(int $id): void
     {
-        $salle = $this->salleRepository->findSalle($id);
+        $salle = $this->salleService->trouver($id);
 
         if (!$salle) {
             http_response_code(404);
@@ -65,7 +61,7 @@ class SalleController extends AbstractController
 
         $this->renderView('salle/form', [
             'title'  => 'Créer une salle',
-            'types'  => TypeSalle::all(),
+            'types'  => $this->salleService->listerTypes(),
             'errors' => $errors,
             'old'    => $old
         ]);
@@ -76,7 +72,7 @@ class SalleController extends AbstractController
         $data = [
             'nom'           => trim($_POST['nom'] ?? ''),
             'batiment'      => trim($_POST['batiment'] ?? ''),
-            'capacite'      => (int)($_POST['capacite'] ?? 0),
+            'capacite'      => (int) ($_POST['capacite'] ?? 0),
             'active'        => isset($_POST['active']),
             'type_salle_id' => $_POST['type_salle_id'] ?? null
         ];
@@ -88,7 +84,7 @@ class SalleController extends AbstractController
             $this->redirect('/salles/create');
         }
 
-                $dto = CreerSalleBuilder::create()
+        $dto = CreerSalleBuilder::create()
             ->nom($data['nom'])
             ->batiment($data['batiment'])
             ->capacite($data['capacite'])
@@ -96,8 +92,7 @@ class SalleController extends AbstractController
             ->typeSalleId($data['type_salle_id'])
             ->build($this->validator);
 
-        $salle = SalleFactory::creerDepuisDTO($dto);
-        $this->salleRepository->saveSalle($salle);
+        $this->salleService->creer($dto);
 
         $_SESSION['success'] = "Salle enregistrée avec succès !";
         $this->redirect('/salles');
@@ -105,7 +100,7 @@ class SalleController extends AbstractController
 
     public function edit(int $id): void
     {
-        $salle = $this->salleRepository->findSalle($id);
+        $salle = $this->salleService->trouver($id);
 
         if (!$salle) {
             http_response_code(404);
@@ -119,7 +114,7 @@ class SalleController extends AbstractController
 
         $this->renderView('salle/form', [
             'title' => "Modifier la salle {$salle->nom}",
-            'types' => TypeSalle::all(),
+            'types' => $this->salleService->listerTypes(),
             'salle' => $salle,
             'errors' => $errors,
             'old' => $old,
@@ -128,7 +123,7 @@ class SalleController extends AbstractController
 
     public function update(int $id): void
     {
-        $salle = $this->salleRepository->findSalle($id);
+        $salle = $this->salleService->trouver($id);
         if (!$salle) {
             http_response_code(404);
             $this->renderView('error/404');
@@ -138,7 +133,7 @@ class SalleController extends AbstractController
         $data = [
             'nom' => trim($_POST['nom'] ?? ''),
             'batiment' => trim($_POST['batiment'] ?? ''),
-            'capacite' => (int)($_POST['capacite'] ?? 0),
+            'capacite' => (int) ($_POST['capacite'] ?? 0),
             'active' => isset($_POST['active']),
             'type_salle_id' => $_POST['type_salle_id'] ?? null,
         ];
@@ -150,7 +145,7 @@ class SalleController extends AbstractController
             $this->redirect("/salles/{$id}/edit");
         }
 
-                $dto = CreerSalleBuilder::create()
+        $dto = CreerSalleBuilder::create()
             ->nom($data['nom'])
             ->batiment($data['batiment'])
             ->capacite($data['capacite'])
@@ -158,8 +153,7 @@ class SalleController extends AbstractController
             ->typeSalleId($data['type_salle_id'])
             ->build($this->validator);
 
-        SalleFactory::remplirDepuisDTO($salle, $dto);
-        $this->salleRepository->saveSalle($salle);
+        $this->salleService->modifier($salle, $dto);
         $this->redirect('/salles');
     }
 }
