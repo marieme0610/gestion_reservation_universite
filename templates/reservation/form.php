@@ -105,35 +105,3 @@ $old = $old ?? [];
     </div>
 </div>
 
-<script>
-(function () {
-    var debutInput = document.getElementById('date_debut');
-    var finInput = document.getElementById('date_fin');
-    var warning = document.getElementById('duree-warning');
-
-    var now = new Date();
-    now.setSeconds(0, 0);
-    var minLocal = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-        .toISOString()
-        .slice(0, 16);
-    debutInput.setAttribute('min', minLocal);
-
-    function checkDuree() {
-        if (!debutInput.value || !finInput.value) {
-            warning.classList.add('d-none');
-            return;
-        }
-        var debut = new Date(debutInput.value);
-        var fin = new Date(finInput.value);
-        var dureeMs = fin - debut;
-        var invalide = dureeMs <= 0 || dureeMs > 4 * 60 * 60 * 1000;
-        warning.classList.toggle('d-none', !invalide);
-    }
-
-    debutInput.addEventListener('change', function () {
-        finInput.setAttribute('min', debutInput.value);
-        checkDuree();
-    });
-    finInput.addEventListener('change', checkDuree);
-})();
-</script>
