@@ -17,13 +17,22 @@ class SalleController extends AbstractController
         private SalleValidator $validator
     ) {}
 
-    public function index(): void
+        public function index(): void
     {
-        $salles = $this->salleRepository->getAllSalle();
+        $criteres = [
+            'nom'           => trim($_GET['nom'] ?? ''),
+            'type_salle_id' => $_GET['type_salle_id'] ?? '',
+        ];
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+
+        $pagination = $this->salleRepository->rechercherEtPaginer($criteres, $page, 9);
 
         $this->renderView('salle/index', [
-            'title'  => 'Liste des salles',
-            'salles' => $salles
+            'title'      => 'Liste des salles',
+            'salles'     => $pagination->items,
+            'pagination' => $pagination,
+            'criteres'   => $criteres,
+            'types'      => TypeSalle::all(),
         ]);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Model\Reservation;
+use App\Support\PaginationResult;
 
 interface ReservationRepositoryInterface{
     public function getAllReservation():array;
@@ -15,4 +16,6 @@ interface ReservationRepositoryInterface{
         \DateTimeImmutable $dateFin
     ): bool;
 
+
+      public function rechercherEtPaginer(array $criteres, int $page, int $parPage): PaginationResult;
 }

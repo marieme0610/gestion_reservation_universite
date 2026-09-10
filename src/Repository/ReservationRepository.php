@@ -3,8 +3,13 @@
 namespace App\Repository;
 use App\Model\Reservation;
 use App\Model\StatutReservation;
+use App\Support\PaginationResult;
+use App\Repository\Filtre\ReservationFiltreInterface;
 
 class ReservationRepository implements ReservationRepositoryInterface{
+
+    public function __construct(private array $filtres) {}
+
     public function getAllReservation():array{
         
         return Reservation::all()->all();
@@ -37,4 +42,30 @@ class ReservationRepository implements ReservationRepositoryInterface{
         ->where('date_fin', '>', $dateDebut->format('Y-m-d H:i:s'))
         ->exists();
 }
+
+
+    public function rechercherEtPaginer(array $criteres, int $page, int $parPage): PaginationResult
+    {
+        $query = Reservation::query();
+
+        foreach ($this->filtres as $filtre) {
+            if ($filtre->estActif($criteres)) {
+                $filtre->appliquerSurRequete($query, $criteres);
+            }
+        }
+
+        $total = (clone $query)->count();
+
+        $page = max(1, $page);
+        $parPage = max(1, $parPage);
+
+        $items = $query->orderBy('date_debut', 'desc')
+            ->skip(($page - 1) * $parPage)
+            ->take($parPage)
+            ->get()
+            ->all();
+
+        return new PaginationResult($items, $total, $page, $parPage);
+    }
+
 }
