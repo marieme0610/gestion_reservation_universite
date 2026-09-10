@@ -1,12 +1,29 @@
+<?php
+/** @var array $reservations */
+$statutBadges = [
+    1 => ['label' => 'Confirmée', 'class' => 'bg-success', 'icon' => 'bi-check-circle'],
+    2 => ['label' => 'Annulée',   'class' => 'bg-secondary', 'icon' => 'bi-x-circle'],
+];
+?>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="h3 mb-0">Liste des Réservations</h1>
-    <a href="/reservations/create" class="btn btn-primary">+ Nouvelle Réservation</a>
+    <div>
+        <h1 class="h3 mb-1">Réservations</h1>
+        <p class="text-muted mb-0">Toutes les réservations de salles de l'université.</p>
+    </div>
+    <a href="/reservations/create" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Nouvelle réservation
+    </a>
 </div>
 
-<div class="card shadow-sm">
+<div class="card">
     <div class="card-body p-0">
         <?php if (empty($reservations)): ?>
-            <div class="p-4 text-center text-muted">Aucune réservation enregistrée.</div>
+            <div class="empty-state">
+                <i class="bi bi-calendar-x"></i>
+                <p class="mb-3">Aucune réservation enregistrée pour le moment.</p>
+                <a href="/reservations/create" class="btn btn-primary btn-sm">Créer la première réservation</a>
+            </div>
         <?php else: ?>
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -24,9 +41,13 @@
                     </thead>
                     <tbody>
                         <?php foreach ($reservations as $reservation): ?>
+                            <?php
+                                $statutId = (int) $reservation->statut_reservation_id;
+                                $badge = $statutBadges[$statutId] ?? ['label' => 'En attente', 'class' => 'bg-warning text-dark', 'icon' => 'bi-hourglass-split'];
+                            ?>
                             <tr>
-                                <th class="ps-3"><?= e($reservation->id) ?></th>
-                                <td><span class="fw-bold"><?= e($reservation->salle->nom ?? 'Salle #' . $reservation->salle_id) ?></span></td>
+                                <td class="ps-3 text-muted">#<?= e($reservation->id) ?></td>
+                                <td class="fw-semibold"><?= e($reservation->salle->nom ?? 'Salle #' . $reservation->salle_id) ?></td>
                                 <td>
                                     <div><?= e($reservation->responsable) ?></div>
                                     <small class="text-muted"><?= e($reservation->email) ?></small>
@@ -35,18 +56,18 @@
                                 <td><small><?= e((new DateTimeImmutable($reservation->date_debut))->format('d/m/Y H:i')) ?></small></td>
                                 <td><small><?= e((new DateTimeImmutable($reservation->date_fin))->format('d/m/Y H:i')) ?></small></td>
                                 <td class="text-center">
-                                    <?php if ((int)$reservation->statut_reservation_id === 1): ?>
-                                        <span class="badge bg-success">Confirmée</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary">Annulée</span>
-                                    <?php endif; ?>
+                                    <span class="badge <?= $badge['class'] ?>"><i class="bi <?= $badge['icon'] ?> me-1"></i><?= $badge['label'] ?></span>
                                 </td>
                                 <td class="text-end pe-3">
                                     <div class="btn-group btn-group-sm">
-                                        <a href="/reservations/<?= e($reservation->id) ?>" class="btn btn-outline-info">Voir</a>
-                                        <?php if ((int)$reservation->statut_reservation_id === 1): ?>
+                                        <a href="/reservations/<?= e($reservation->id) ?>" class="btn btn-outline-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <?php if ($statutId === 1): ?>
                                             <form action="/reservations/<?= e($reservation->id) ?>/cancel" method="POST" class="d-inline" onsubmit="return confirm('Annuler cette réservation ?');">
-                                                <button type="submit" class="btn btn-outline-danger">Annuler</button>
+                                                <button type="submit" class="btn btn-outline-danger">
+                                                    <i class="bi bi-x-lg"></i>
+                                                </button>
                                             </form>
                                         <?php endif; ?>
                                     </div>
