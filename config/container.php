@@ -30,6 +30,8 @@ use App\Service\Regle\RegleAbsenceDeConflit;
 use App\Rendering\ResponseRendererInterface;
 use App\Rendering\HtmlRenderer;
 use App\Rendering\JsonRenderer;
+use App\Service\SalleService;
+use App\Service\ReservationQueryService;
 
 return [
 
@@ -65,6 +67,8 @@ CreerReservationService::class => autowire()
     ->constructorParameter('regles', get('reservation.regles')),
     AnnulerReservationService::class => autowire(),
 
+    SalleService::class => autowire(),
+    ReservationQueryService::class => autowire(),
 
     SalleController::class => autowire(),
     ReservationController::class => autowire(),

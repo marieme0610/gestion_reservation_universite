@@ -2,11 +2,9 @@
 
 namespace App\Controller;
 
-use App\DTO\CreerReservationDTO;
 use App\Service\CreerReservationService;
 use App\Service\AnnulerReservationService;
-use App\Repository\ReservationRepositoryInterface;
-use App\Repository\SalleRepositoryInterface;
+use App\Service\ReservationQueryService;
 use App\Validation\ReservationValidator;
 use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationInvalideException;
@@ -17,9 +15,8 @@ use App\Rendering\ResponseRendererInterface;
 
 class ReservationController extends AbstractController
 {
-       public function __construct(
-        private ReservationRepositoryInterface $reservationRepository,
-        private SalleRepositoryInterface $salleRepository,
+    public function __construct(
+        private ReservationQueryService $reservationQueryService,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
         private ReservationValidator $validator,
@@ -28,7 +25,7 @@ class ReservationController extends AbstractController
         parent::__construct($renderer);
     }
 
-        public function index(): void
+    public function index(): void
     {
         $criteres = [
             'salle_id'              => $_GET['salle_id'] ?? '',
@@ -36,8 +33,8 @@ class ReservationController extends AbstractController
         ];
         $page = max(1, (int) ($_GET['page'] ?? 1));
 
-        $pagination = $this->reservationRepository->rechercherEtPaginer($criteres, $page, 5);
-        $salles = $this->salleRepository->getAllSalle();
+        $pagination = $this->reservationQueryService->rechercherEtPaginer($criteres, $page, 5);
+        $salles = $this->reservationQueryService->listerSallesDisponibles();
 
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
@@ -54,7 +51,7 @@ class ReservationController extends AbstractController
 
     public function show(int $id): void
     {
-        $reservation = $this->reservationRepository->findReservation($id);
+        $reservation = $this->reservationQueryService->trouver($id);
 
         if (!$reservation) {
             http_response_code(404);
@@ -70,7 +67,7 @@ class ReservationController extends AbstractController
 
     public function create(): void
     {
-        $salles = $this->salleRepository->getAllSalle();
+        $salles = $this->reservationQueryService->listerSallesDisponibles();
         $errors = $_SESSION['errors'] ?? [];
         $old    = $_SESSION['old'] ?? [];
 
@@ -111,9 +108,9 @@ class ReservationController extends AbstractController
                 ->motif($data['motif'])
                 ->dateDebut($data['date_debut'])
                 ->dateFin($data['date_fin'])
-                ->build($this->validator);            
-                
-                $reservationId = $this->creerReservationService->creatReservation($dto);
+                ->build($this->validator);
+
+            $reservationId = $this->creerReservationService->creatReservation($dto);
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
             $this->redirect('/reservations');
