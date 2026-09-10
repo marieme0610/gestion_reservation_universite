@@ -27,6 +27,9 @@ use App\Service\Regle\RegleOrdreDates;
 use App\Service\Regle\RegleDureeMaximale;
 use App\Service\Regle\RegleDateFuture;
 use App\Service\Regle\RegleAbsenceDeConflit;
+use App\Rendering\ResponseRendererInterface;
+use App\Rendering\HtmlRenderer;
+use App\Rendering\JsonRenderer;
 
 return [
 
@@ -71,6 +74,15 @@ CreerReservationService::class => autowire()
             $routesDefinition = require dirname(__DIR__) . '/routes/web.php';
             $routesDefinition($r);
         });
+    }),
+
+        ResponseRendererInterface::class => factory(function (): ResponseRendererInterface {
+        $mode = $_ENV['RENDER_MODE'] ?? 'html';
+
+        return match ($mode) {
+            'json'  => new JsonRenderer(),
+            default => new HtmlRenderer(),
+        };
     }),
 
     Application::class => autowire(),

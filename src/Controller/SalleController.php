@@ -9,13 +9,17 @@ use App\Repository\SalleRepositoryInterface;
 use App\Validation\SalleValidator;
 use App\DTO\CreerSalleBuilder;
 use App\Factory\SalleFactory;
+use App\Rendering\ResponseRendererInterface;
 
 class SalleController extends AbstractController
 {
-    public function __construct(
+        public function __construct(
         private SalleRepositoryInterface $salleRepository,
-        private SalleValidator $validator
-    ) {}
+        private SalleValidator $validator,
+        ResponseRendererInterface $renderer
+    ) {
+        parent::__construct($renderer);
+    }
 
         public function index(): void
     {
