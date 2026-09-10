@@ -1,5 +1,8 @@
 <?php
 $errors = $errors ?? [];
+$currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?? '/';
+$isActive = static fn(string $prefix): bool =>
+    $prefix === '/' ? $currentPath === '/' : str_starts_with($currentPath, $prefix);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -8,52 +11,71 @@ $errors = $errors ?? [];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($title ?? 'Système de Réservation de Salles') ?></title>
-    <link rel="stylesheet" href="/assets/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/style.css">
 </head>
 
-<body class="bg-light">
+<body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <nav class="navbar navbar-expand-lg app-navbar mb-4">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="/salles">Gestion Réservations</a>
-            <div class="navbar-nav">
-                <a class="nav-link" href="/salles">Salles</a>
-                <a class="nav-link" href="/reservations">Réservations</a>
-                <a class="nav-link btn btn-outline-light ms-2 text-white" href="/reservations/create">+ Réserver</a>
+            <a class="navbar-brand" href="/salles">
+                <span class="brand-icon"><i class="bi bi-building"></i></span>
+                Gestion Réservations
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMain">
+                <div class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                    <a class="nav-link <?= $isActive('/salles') ? 'active' : '' ?>" href="/salles">
+                        <i class="bi bi-door-open me-1"></i>Salles
+                    </a>
+                    <a class="nav-link <?= ($isActive('/reservations') && $currentPath !== '/reservations/create') ? 'active' : '' ?>" href="/reservations">
+                        <i class="bi bi-calendar3 me-1"></i>Réservations
+                    </a>
+                    <a class="btn btn-brand ms-lg-3" href="/reservations/create">
+                        <i class="bi bi-plus-lg me-1"></i>Réserver
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
 
     <main class="container mb-5">
-        <!-- Message de succès global -->
         <?php if (!empty($_SESSION['success'])): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?= e($_SESSION['success']) ?>
+            <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div><?= e($_SESSION['success']) ?></div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
                 <?php unset($_SESSION['success']); ?>
             </div>
         <?php endif; ?>
 
-        <!-- Erreur globale métier (ex: SalleIndisponibleException) -->
         <?php if (!empty($errors['globale'] ?? null)): ?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <strong>Erreur :</strong> <?= e($errors['globale']) ?>
+            <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+                <div><strong>Erreur :</strong> <?= e($errors['globale']) ?></div>
+                <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($errors) && empty($errors['globale'])): ?>
-            <div class="alert alert-danger" role="alert">
-                <strong>Veuillez corriger les champs signalés.</strong>
+            <div class="alert alert-danger d-flex align-items-center gap-2" role="alert">
+                <i class="bi bi-exclamation-circle-fill fs-5"></i>
+                <div><strong>Veuillez corriger les champs signalés ci-dessous.</strong></div>
             </div>
         <?php endif; ?>
 
-        <!-- Injection dynamique du contenu de la vue -->
         <?= $content ?? '' ?>
     </main>
 
-    <footer class="footer mt-auto py-3 bg-white border-top text-center text-muted">
+    <footer class="app-footer py-4 text-center">
         <div class="container">
-            <small>&copy; Université - Tous droits réservés</small>
+            <small>&copy; <?= date('Y') ?> Université — Gestion des Réservations de Salles</small>
         </div>
     </footer>
 
