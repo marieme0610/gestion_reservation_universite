@@ -25,7 +25,7 @@ class SalleController extends AbstractController
         ];
         $page = max(1, (int) ($_GET['page'] ?? 1));
 
-        $pagination = $this->salleRepository->rechercherEtPaginer($criteres, $page, 9);
+        $pagination = $this->salleRepository->rechercherEtPaginer($criteres, $page, 5);
 
         $this->renderView('salle/index', [
             'title'      => 'Liste des salles',

@@ -4,7 +4,7 @@
 use App\Application;
 use DI\ContainerBuilder;
 
-require dirname(__DIR__) . '/vendor/autoload.php';
+require dirname(__DIR__) . '/config/bootstrap.php';
 
 $builder = new ContainerBuilder();
 $builder->addDefinitions(
