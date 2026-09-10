@@ -13,16 +13,20 @@ use App\Exception\ReservationInvalideException;
 use App\Exception\ReservationIntrouvableException;
 use Exception;
 use App\DTO\CreerReservationBuilder;
+use App\Rendering\ResponseRendererInterface;
 
 class ReservationController extends AbstractController
 {
-    public function __construct(
+       public function __construct(
         private ReservationRepositoryInterface $reservationRepository,
         private SalleRepositoryInterface $salleRepository,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
-        private ReservationValidator $validator
-    ) {}
+        private ReservationValidator $validator,
+        ResponseRendererInterface $renderer
+    ) {
+        parent::__construct($renderer);
+    }
 
         public function index(): void
     {
