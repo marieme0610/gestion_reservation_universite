@@ -9,6 +9,7 @@ use App\Repository\SalleRepositoryInterface;
 use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationInvalideException;
 use DateTimeImmutable;
+use App\Factory\ReservationFactory;
 
 class CreerReservationService
 {
@@ -54,14 +55,7 @@ class CreerReservationService
             throw new SalleIndisponibleException("La salle est déjà réservée sur ce créneau horaire.");
         }
 
-        $newReservation = new Reservation();
-        $newReservation->salle_id = $salle_id;
-        $newReservation->statut_reservation_id = 1;
-        $newReservation->responsable = $responsable;
-        $newReservation->email = $email;
-        $newReservation->motif = $motif;
-        $newReservation->date_debut = $debut->format('Y-m-d H:i:s');
-        $newReservation->date_fin = $fin->format('Y-m-d H:i:s');
+        $newReservation = ReservationFactory::creerDepuisDTO($creerReservationDto);
 
         return $this->reservationRepository->saveReservation($newReservation);
     }

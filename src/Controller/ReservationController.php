@@ -12,6 +12,7 @@ use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationInvalideException;
 use App\Exception\ReservationIntrouvableException;
 use Exception;
+use App\DTO\CreerReservationBuilder;
 
 class ReservationController extends AbstractController
 {
@@ -88,8 +89,14 @@ class ReservationController extends AbstractController
         }
 
         try {
-            $dto = CreerReservationDTO::fromArray($this->validator, $data);
-            $reservationId = $this->creerReservationService->creatReservation($dto);
+            $dto = CreerReservationBuilder::create()
+                ->salleId($data['salle_id'])
+                ->responsable($data['responsable'])
+                ->email($data['email'])
+                ->motif($data['motif'])
+                ->dateDebut($data['date_debut'])
+                ->dateFin($data['date_fin'])
+                ->build($this->validator);            $reservationId = $this->creerReservationService->creatReservation($dto);
 
             $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
             $this->redirect('/reservations');
