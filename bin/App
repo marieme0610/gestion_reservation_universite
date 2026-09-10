@@ -31,7 +31,7 @@ if ($command === 'migrate') {
 } elseif ($command === 'seed') {
     $seeder = require __DIR__ . '/../database/seeds/DatabaseSeeder.php';
     $seeder->run();
-    echo "🌱 Seeding terminé avec succès !\n";
+    echo "Seeding terminé avec succès !\n";
 } else {
-    echo "Usage : ./jean [migrate|rollback|seed]\n";
+    echo "Usage : ./marieme [migrate|rollback|seed]\n";
 }

@@ -18,11 +18,27 @@ use FastRoute\RouteCollector;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use function DI\autowire;
 use function DI\factory;
+use App\Repository\Filtre\Reservation\FiltreParSalle;
+use App\Repository\Filtre\Reservation\FiltreParStatut;
+use App\Repository\Filtre\Salle\FiltreParNom;
+use App\Repository\Filtre\Salle\FiltreParType;
+use function DI\get;
 
 return [
 
-    SalleRepositoryInterface::class => autowire(SalleRepository::class),
-    ReservationRepositoryInterface::class => autowire(ReservationRepository::class),
+        'salle.filtres' => [
+        autowire(FiltreParNom::class),
+        autowire(FiltreParType::class),
+    ],
+    'reservation.filtres' => [
+        autowire(FiltreParSalle::class),
+        autowire(FiltreParStatut::class),
+    ],
+
+    SalleRepositoryInterface::class => autowire(SalleRepository::class)
+        ->constructorParameter('filtres', get('salle.filtres')),
+    ReservationRepositoryInterface::class => autowire(ReservationRepository::class)
+        ->constructorParameter('filtres', get('reservation.filtres')),
 
 
     Capsule::class => factory(function (): Capsule {

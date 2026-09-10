@@ -7,6 +7,8 @@ namespace Tests\Integration;
 use App\Model\Reservation;
 use App\Model\Salle;
 use App\Repository\ReservationRepository;
+use App\Repository\Filtre\Reservation\FiltreParSalle;
+use App\Repository\Filtre\Reservation\FiltreParStatut;
 use DateTimeImmutable;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use PHPUnit\Framework\TestCase;
@@ -70,7 +72,10 @@ final class IntegrationTest extends TestCase
             'date_fin' => '2030-01-01 12:00:00',
         ]);
 
-        $repository = new ReservationRepository();
+        $repository = new ReservationRepository([
+        new FiltreParSalle(),
+        new FiltreParStatut(),
+]);
         $this->assertTrue($repository->chercherConflit($salle->id, new DateTimeImmutable('2030-01-01 11:00:00'), new DateTimeImmutable('2030-01-01 13:00:00')));
     }
 }

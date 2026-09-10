@@ -24,16 +24,26 @@ class ReservationController extends AbstractController
         private ReservationValidator $validator
     ) {}
 
-    public function index(): void
+        public function index(): void
     {
-        $reservations = $this->reservationRepository->getAllReservation();
+        $criteres = [
+            'salle_id'              => $_GET['salle_id'] ?? '',
+            'statut_reservation_id' => $_GET['statut_reservation_id'] ?? '',
+        ];
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+
+        $pagination = $this->reservationRepository->rechercherEtPaginer($criteres, $page, 10);
+        $salles = $this->salleRepository->getAllSalle();
 
         $errors = $_SESSION['errors'] ?? [];
         unset($_SESSION['errors']);
 
         $this->renderView('reservation/index', [
             'title'        => 'Liste des réservations',
-            'reservations' => $reservations,
+            'reservations' => $pagination->items,
+            'pagination'   => $pagination,
+            'criteres'     => $criteres,
+            'salles'       => $salles,
             'errors'       => $errors,
         ]);
     }
