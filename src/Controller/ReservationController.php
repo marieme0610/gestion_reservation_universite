@@ -32,7 +32,7 @@ class ReservationController extends AbstractController
         ];
         $page = max(1, (int) ($_GET['page'] ?? 1));
 
-        $pagination = $this->reservationRepository->rechercherEtPaginer($criteres, $page, 10);
+        $pagination = $this->reservationRepository->rechercherEtPaginer($criteres, $page, 5);
         $salles = $this->salleRepository->getAllSalle();
 
         $errors = $_SESSION['errors'] ?? [];

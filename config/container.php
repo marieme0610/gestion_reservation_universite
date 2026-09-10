@@ -15,7 +15,6 @@ use App\Repository\ReservationRepository;
 use FastRoute\Dispatcher;
 use function FastRoute\simpleDispatcher;
 use FastRoute\RouteCollector;
-use Illuminate\Database\Capsule\Manager as Capsule;
 use function DI\autowire;
 use function DI\factory;
 use App\Repository\Filtre\Reservation\FiltreParSalle;
@@ -23,12 +22,17 @@ use App\Repository\Filtre\Reservation\FiltreParStatut;
 use App\Repository\Filtre\Salle\FiltreParNom;
 use App\Repository\Filtre\Salle\FiltreParType;
 use function DI\get;
+use App\Service\Regle\RegleSalleActive;
+use App\Service\Regle\RegleOrdreDates;
+use App\Service\Regle\RegleDureeMaximale;
+use App\Service\Regle\RegleDateFuture;
+use App\Service\Regle\RegleAbsenceDeConflit;
 
 return [
 
-        'salle.filtres' => [
-        autowire(FiltreParNom::class),
-        autowire(FiltreParType::class),
+    'salle.filtres' => [
+    autowire(FiltreParNom::class),
+    autowire(FiltreParType::class),
     ],
     'reservation.filtres' => [
         autowire(FiltreParSalle::class),
@@ -41,23 +45,21 @@ return [
         ->constructorParameter('filtres', get('reservation.filtres')),
 
 
-    Capsule::class => factory(function (): Capsule {
-        $capsule = new Capsule();
-
-        $dbConfig = require dirname(__DIR__) . '/config/database.php';
-        $capsule->addConnection($dbConfig);
-
-        $capsule->setAsGlobal();
-        $capsule->bootEloquent();
-
-        return $capsule;
-    }),
-
 
     SalleValidator::class => autowire(),
     ReservationValidator::class => autowire(),
 
-    CreerReservationService::class => autowire(),
+    'reservation.regles' => [
+        
+    autowire(RegleSalleActive::class),
+    autowire(RegleOrdreDates::class),
+    autowire(RegleDureeMaximale::class),
+    autowire(RegleDateFuture::class),
+    autowire(RegleAbsenceDeConflit::class),
+],
+
+CreerReservationService::class => autowire()
+    ->constructorParameter('regles', get('reservation.regles')),
     AnnulerReservationService::class => autowire(),
 
 

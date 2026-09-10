@@ -14,6 +14,11 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use Tests\Doubles\InMemoryReservationRepository;
 use Tests\Doubles\InMemorySalleRepository;
+use App\Service\Regle\RegleSalleActive;
+use App\Service\Regle\RegleOrdreDates;
+use App\Service\Regle\RegleDureeMaximale;
+use App\Service\Regle\RegleDateFuture;
+use App\Service\Regle\RegleAbsenceDeConflit;
 
 final class CreerReservationServiceTest extends TestCase
 {
@@ -25,7 +30,13 @@ final class CreerReservationServiceTest extends TestCase
     {
         $this->salles = new InMemorySalleRepository();
         $this->reservations = new InMemoryReservationRepository();
-        $this->service = new CreerReservationService($this->salles, $this->reservations);
+                $this->service = new CreerReservationService($this->salles, $this->reservations, [
+            new RegleSalleActive(),
+            new RegleOrdreDates(),
+            new RegleDureeMaximale(),
+            new RegleDateFuture(),
+            new RegleAbsenceDeConflit(),
+        ]);
     }
 
     private function dto(string $debut, string $fin): CreerReservationDTO
