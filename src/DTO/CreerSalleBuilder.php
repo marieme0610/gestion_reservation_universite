@@ -2,17 +2,16 @@
 
 namespace App\DTO;
 
-use App\DTO\CreerSalleDTO;
 use App\Validation\ValidatorInterface;
 
 class CreerSalleBuilder
 {
     private function __construct(
-        public ?string $nom = null,
-        public ?string $batiment = null,
-        public ?int $capacite = null,
-        public ?bool $active = null,
-        public ?int $typeSalleId = null
+        private mixed $nom = '',
+        private mixed $batiment = '',
+        private mixed $capacite = null,
+        private mixed $active = null,
+        private mixed $typeSalleId = null
     ) {}
 
     public static function create(): self
@@ -20,27 +19,31 @@ class CreerSalleBuilder
         return new self();
     }
 
-    public function nom(string $nom)
+    public function nom(mixed $nom): self
     {
         $this->nom = $nom;
         return $this;
     }
-    public function batiment(string $batiment)
+
+    public function batiment(mixed $batiment): self
     {
         $this->batiment = $batiment;
         return $this;
     }
-    public function capacite(int $capacite)
+
+    public function capacite(mixed $capacite): self
     {
         $this->capacite = $capacite;
         return $this;
     }
-    public function active(bool $active)
+
+    public function active(mixed $active): self
     {
         $this->active = $active;
         return $this;
     }
-    public function typeSalleId(int $typeSalleId)
+
+    public function typeSalleId(mixed $typeSalleId): self
     {
         $this->typeSalleId = $typeSalleId;
         return $this;
@@ -49,10 +52,10 @@ class CreerSalleBuilder
     public function build(ValidatorInterface $validator): CreerSalleDTO
     {
         $data = [
-            'nom' => $this->nom,
-            'batiment' => $this->batiment,
-            'capacite' => $this->capacite,
-            'active' => $this->active,
+            'nom'           => $this->nom,
+            'batiment'      => $this->batiment,
+            'capacite'      => $this->capacite,
+            'active'        => $this->active,
             'type_salle_id' => $this->typeSalleId,
         ];
 

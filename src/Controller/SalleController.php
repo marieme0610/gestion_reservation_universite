@@ -7,6 +7,8 @@ use App\Model\Salle;
 use App\Model\TypeSalle;
 use App\Repository\SalleRepositoryInterface;
 use App\Validation\SalleValidator;
+use App\DTO\CreerSalleBuilder;
+use App\Factory\SalleFactory;
 
 class SalleController extends AbstractController
 {
@@ -73,15 +75,15 @@ class SalleController extends AbstractController
             $this->redirect('/salles/create');
         }
 
-        $dto = CreerSalleDTO::fromArray($this->validator, $data);
-        $salle = new Salle();
-        $salle->fill([
-            'nom' => $dto->nom,
-            'batiment' => $dto->batiment,
-            'capacite' => $dto->capacite,
-            'active' => $dto->active,
-            'type_salle_id' => $dto->typeSalleId,
-        ]);
+                $dto = CreerSalleBuilder::create()
+            ->nom($data['nom'])
+            ->batiment($data['batiment'])
+            ->capacite($data['capacite'])
+            ->active($data['active'])
+            ->typeSalleId($data['type_salle_id'])
+            ->build($this->validator);
+
+        $salle = SalleFactory::creerDepuisDTO($dto);
         $this->salleRepository->saveSalle($salle);
 
         $_SESSION['success'] = "Salle enregistrée avec succès !";
@@ -135,7 +137,15 @@ class SalleController extends AbstractController
             $this->redirect("/salles/{$id}/edit");
         }
 
-        $salle->fill($data);
+                $dto = CreerSalleBuilder::create()
+            ->nom($data['nom'])
+            ->batiment($data['batiment'])
+            ->capacite($data['capacite'])
+            ->active($data['active'])
+            ->typeSalleId($data['type_salle_id'])
+            ->build($this->validator);
+
+        SalleFactory::remplirDepuisDTO($salle, $dto);
         $this->salleRepository->saveSalle($salle);
         $this->redirect('/salles');
     }
