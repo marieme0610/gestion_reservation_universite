@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Core\SessionManager;
+use App\Exception\AccesRefuseException;
 use FastRoute\Dispatcher;
 use Psr\Container\ContainerInterface;
 
@@ -42,13 +43,24 @@ final class Application
                     break;
 
                 case Dispatcher::FOUND:
-                    [$controllerClass, $method] = $routeInfo[1];
+                    [$controllerClass, $method, $groupeMiddleware] = $routeInfo[1];
                     $vars = $routeInfo[2];
+
+                    if ($groupeMiddleware !== 'public') {
+                        $middlewares = $this->container->get('middlewares.' . $groupeMiddleware);
+                        foreach ($middlewares as $middleware) {
+                            $middleware->verifier();
+                        }
+                    }
 
                     $controller = $this->container->get($controllerClass);
                     $controller->$method(...array_values($vars));
                     break;
             }
+        } catch (AccesRefuseException $exception) {
+            $this->session->set('errors', ['globale' => $exception->getMessage()]);
+            header('Location: ' . $exception->redirectTo);
+            exit;
         } catch (\Throwable $exception) {
             error_log((string) $exception);
             http_response_code(500);

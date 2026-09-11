@@ -19,7 +19,7 @@ class SalleController extends AbstractController
         parent::__construct($renderer);
     }
 
-    public function index(): void
+        public function index(): void
     {
         $criteres = [
             'nom'           => trim($_GET['nom'] ?? ''),
@@ -29,12 +29,16 @@ class SalleController extends AbstractController
 
         $pagination = $this->salleService->rechercherEtPaginer($criteres, $page, 5);
 
+        $errors = $this->session->get('errors', []);
+        $this->session->unset('errors');
+
         $this->renderView('salle/index', [
             'title'      => 'Liste des salles',
             'salles'     => $pagination->items,
             'pagination' => $pagination,
             'criteres'   => $criteres,
             'types'      => $this->salleService->listerTypes(),
+            'errors'     => $errors,
         ]);
     }
 

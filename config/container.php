@@ -37,6 +37,8 @@ use App\Controller\AuthController;
 use App\Service\AuthService;
 use App\Repository\UtilisateurRepositoryInterface;
 use App\Repository\UtilisateurRepository;
+use App\Middleware\AuthMiddleware;
+use App\Middleware\AdminMiddleware;
 
 return [
 
@@ -47,6 +49,14 @@ return [
     'reservation.filtres' => [
         autowire(FiltreParSalle::class),
         autowire(FiltreParStatut::class),
+    ],
+
+        'middlewares.connecte' => [
+        autowire(AuthMiddleware::class),
+    ],
+    'middlewares.admin' => [
+        autowire(AuthMiddleware::class),
+        autowire(AdminMiddleware::class),
     ],
 
     SalleRepositoryInterface::class => autowire(SalleRepository::class)

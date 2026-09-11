@@ -11,9 +11,11 @@ $criteresActifs = array_filter($criteres, fn($v) => $v !== '');
         <h1 class="h3 mb-1">Salles de cours</h1>
         <p class="text-muted mb-0">Toutes les salles disponibles pour réservation.</p>
     </div>
-    <a href="/salles/create" class="btn btn-primary">
-        <i class="bi bi-plus-lg me-1"></i>Nouvelle salle
-    </a>
+        <?php if (($_SESSION['auth_role'] ?? null) === 'admin'): ?>
+        <a href="/salles/create" class="btn btn-primary">
+            <i class="bi bi-plus-lg me-1"></i>Nouvelle salle
+        </a>
+    <?php endif; ?>
 </div>
 
 <form method="GET" action="/salles" class="card mb-4">
@@ -78,9 +80,11 @@ $criteresActifs = array_filter($criteres, fn($v) => $v !== '');
                             <strong><?= e($salle->capacite) ?></strong> personnes
                         </p>
                     </div>
-                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
                         <a href="/salles/<?= e($salle->id) ?>" class="btn btn-sm btn-outline-primary">Détails</a>
-                        <a href="/salles/<?= e($salle->id) ?>/edit" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        <?php if (($_SESSION['auth_role'] ?? null) === 'admin'): ?>
+                            <a href="/salles/<?= e($salle->id) ?>/edit" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
