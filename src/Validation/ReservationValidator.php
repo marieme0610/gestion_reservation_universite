@@ -5,8 +5,16 @@ namespace App\Validation;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
 
-
-class ReservationValidator implements ReservationValidatorInterface{
+class ReservationValidator implements ReservationValidatorInterface
+{
+    private array $messages = [
+        'salle_id'    => "Veuillez sélectionner une salle valide.",
+        'responsable' => "Le nom du responsable doit contenir entre 2 et 120 caractères.",
+        'motif'       => "Le motif doit contenir entre 5 et 255 caractères.",
+        'email'       => "L'adresse email n'est pas valide.",
+        'date_debut'  => "La date de début n'est pas une date valide.",
+        'date_fin'    => "La date de fin n'est pas une date valide.",
+    ];
 
     public function validate(array $data): ValidationResult
     {
@@ -24,7 +32,7 @@ class ReservationValidator implements ReservationValidatorInterface{
             try {
                 $rule->assert($data);
             } catch (NestedValidationException $e) {
-                $errors[$key] = "Le champ '{$key}' est invalide.";
+                $errors[$key] = $this->messages[$key] ?? "Le champ '{$key}' est invalide.";
             }
         }
 
