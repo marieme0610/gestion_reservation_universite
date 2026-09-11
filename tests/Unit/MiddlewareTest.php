@@ -12,6 +12,8 @@ use App\Model\Utilisateur;
 use App\Service\AuthService;
 use PHPUnit\Framework\TestCase;
 use Tests\Doubles\InMemoryUtilisateurRepository;
+use App\Middleware\RenderModeMiddleware;
+use App\Rendering\RenderModeResolver;
 
 final class MiddlewareTest extends TestCase
 {
@@ -75,5 +77,17 @@ final class MiddlewareTest extends TestCase
 
         $middleware->verifier();
         $this->assertTrue(true);
+    }
+
+        public function testRenderModeMiddlewareLitLaVariableEnvironnement(): void
+    {
+        $_ENV['RENDER_MODE'] = 'json';
+        $resolver = new RenderModeResolver();
+        $middleware = new RenderModeMiddleware($resolver);
+
+        $middleware->verifier();
+
+        $this->assertSame('json', $resolver->getMode());
+        unset($_ENV['RENDER_MODE']);
     }
 }
