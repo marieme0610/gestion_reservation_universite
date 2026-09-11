@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Core\SessionManager;
 use App\Service\SalleService;
 use App\Validation\SalleValidator;
 use App\DTO\CreerSalleBuilder;
@@ -12,6 +13,7 @@ class SalleController extends AbstractController
     public function __construct(
         private SalleService $salleService,
         private SalleValidator $validator,
+        private SessionManager $session,
         ResponseRendererInterface $renderer
     ) {
         parent::__construct($renderer);
@@ -54,10 +56,11 @@ class SalleController extends AbstractController
 
     public function create(): void
     {
-        $errors = $_SESSION['errors'] ?? [];
-        $old    = $_SESSION['old'] ?? [];
+        $errors = $this->session->get('errors', []);
+        $old    = $this->session->get('old', []);
 
-        unset($_SESSION['errors'], $_SESSION['old']);
+        $this->session->unset('errors');
+        $this->session->unset('old');
 
         $this->renderView('salle/form', [
             'title'  => 'Créer une salle',
@@ -79,8 +82,8 @@ class SalleController extends AbstractController
 
         $validationResult = $this->validator->validate($data);
         if (!$validationResult->isValid()) {
-            $_SESSION['errors'] = $validationResult->errors();
-            $_SESSION['old']    = $data;
+            $this->session->set('errors', $validationResult->errors());
+            $this->session->set('old', $data);
             $this->redirect('/salles/create');
         }
 
@@ -94,7 +97,7 @@ class SalleController extends AbstractController
 
         $this->salleService->creer($dto);
 
-        $_SESSION['success'] = "Salle enregistrée avec succès !";
+        $this->session->set('success', "Salle enregistrée avec succès !");
         $this->redirect('/salles');
     }
 
@@ -108,9 +111,10 @@ class SalleController extends AbstractController
             return;
         }
 
-        $errors = $_SESSION['errors'] ?? [];
-        $old = $_SESSION['old'] ?? [];
-        unset($_SESSION['errors'], $_SESSION['old']);
+        $errors = $this->session->get('errors', []);
+        $old    = $this->session->get('old', []);
+        $this->session->unset('errors');
+        $this->session->unset('old');
 
         $this->renderView('salle/form', [
             'title' => "Modifier la salle {$salle->nom}",
@@ -140,8 +144,8 @@ class SalleController extends AbstractController
 
         $validationResult = $this->validator->validate($data);
         if (!$validationResult->isValid()) {
-            $_SESSION['errors'] = $validationResult->errors();
-            $_SESSION['old'] = $data;
+            $this->session->set('errors', $validationResult->errors());
+            $this->session->set('old', $data);
             $this->redirect("/salles/{$id}/edit");
         }
 

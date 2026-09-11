@@ -32,6 +32,11 @@ use App\Rendering\HtmlRenderer;
 use App\Rendering\JsonRenderer;
 use App\Service\SalleService;
 use App\Service\ReservationQueryService;
+use App\Core\SessionManager;
+use App\Controller\AuthController;
+use App\Service\AuthService;
+use App\Repository\UtilisateurRepositoryInterface;
+use App\Repository\UtilisateurRepository;
 
 return [
 
@@ -49,7 +54,10 @@ return [
     ReservationRepositoryInterface::class => autowire(ReservationRepository::class)
         ->constructorParameter('filtres', get('reservation.filtres')),
 
-
+    SessionManager::class => autowire(),
+    UtilisateurRepositoryInterface::class => autowire(UtilisateurRepository::class),
+    AuthService::class => autowire(),
+    AuthController::class => autowire(),
 
     SalleValidator::class => autowire(),
     ReservationValidator::class => autowire(),

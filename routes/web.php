@@ -3,10 +3,15 @@
 use FastRoute\RouteCollector;
 use App\Controller\SalleController;
 use App\Controller\ReservationController;
+use App\Controller\AuthController;
 
 return function (RouteCollector $r) {
 
     $r->addRoute('GET', '/', [SalleController::class, 'index']);
+
+    $r->addRoute('GET', '/login', [AuthController::class, 'showLogin']);
+    $r->addRoute('POST', '/login', [AuthController::class, 'login']);
+    $r->addRoute('POST', '/logout', [AuthController::class, 'logout']);
 
     $r->addRoute('GET', '/salles', [SalleController::class, 'index']);
     $r->addRoute('GET', '/salles/create', [SalleController::class, 'create']);

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Core\SessionManager;
 use FastRoute\Dispatcher;
 use Psr\Container\ContainerInterface;
 
@@ -9,14 +10,13 @@ final class Application
 {
     public function __construct(
         private Dispatcher $dispatcher,
-        private ContainerInterface $container
+        private ContainerInterface $container,
+        private SessionManager $session
     ) {}
 
     public function run(): void
     {
-        if (session_status() !== PHP_SESSION_ACTIVE) {
-            session_start();
-        }
+        $this->session->initSession();
 
         try {
             $httpMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
