@@ -6,8 +6,7 @@ use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
 
 
-class ReservationValidator implements ValidatorInterface
-{
+class ReservationValidator implements ReservationValidatorInterface{
 
     public function validate(array $data): ValidationResult
     {

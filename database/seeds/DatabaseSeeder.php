@@ -3,12 +3,13 @@
 return new class {
     public function run(): void
     {
-        echo "🌱 Début de l'exécution globale des Seeders...\n";
+        echo " Début de l'exécution globale des Seeders...\n";
 
         $seeders = [
             'TypeSalleSeeder.php',
             'StatutReservationSeeder.php',
             'SalleSeeder.php',
+            'UtilisateurSeeder.php',
         ];
 
         foreach ($seeders as $file) {

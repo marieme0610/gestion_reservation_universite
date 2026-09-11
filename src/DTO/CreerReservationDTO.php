@@ -3,7 +3,7 @@
 namespace App\DTO;
 
 use App\Exception\ValidationException;
-use App\Validation\ValidatorInterface;
+use App\Validation\ReservationValidatorInterface;
 
 readonly class CreerReservationDTO
 {
@@ -16,8 +16,7 @@ readonly class CreerReservationDTO
         public \DateTimeImmutable $dateFin
     ) {}
 
-    public static function fromArray(ValidatorInterface $validator,array $data): self
-    {
+    public static function fromArray(ReservationValidatorInterface $validator, array $data): self    {
 
         $validationResult = $validator->validate($data);
 

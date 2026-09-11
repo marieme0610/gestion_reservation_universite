@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Validation;
-use App\Validation\ValidationResult;
 
-interface ValidatorInterface{
+interface ReservationValidatorInterface
+{
     public function validate(array $data): ValidationResult;
 }

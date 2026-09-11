@@ -37,13 +37,25 @@ $isActive = static fn(string $prefix): bool =>
                     <a class="nav-link <?= ($isActive('/reservations') && $currentPath !== '/reservations/create') ? 'active' : '' ?>" href="/reservations">
                         <i class="bi bi-calendar3 me-1"></i>Réservations
                     </a>
-                    <a class="btn btn-brand ms-lg-3" href="/reservations/create">
-                        <i class="bi bi-plus-lg me-1"></i>Réserver
+                                    <a class="btn btn-brand ms-lg-3" href="/reservations/create">
+                    <i class="bi bi-plus-lg me-1"></i>Réserver
+                </a>
+                <?php if (isset($_SESSION['auth_id'])): ?>
+                    <span class="nav-link text-white-50">
+                        <i class="bi bi-person-circle me-1"></i><?= e($_SESSION['auth_nom']) ?>
+                    </span>
+                    <form action="/logout" method="POST" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light btn-sm ms-2">Déconnexion</button>
+                    </form>
+                <?php else: ?>
+                    <a class="nav-link" href="/login">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Connexion
                     </a>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <main class="container mb-5">
         <?php if (!empty($_SESSION['success'])): ?>

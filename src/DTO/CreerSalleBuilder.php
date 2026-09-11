@@ -2,7 +2,7 @@
 
 namespace App\DTO;
 
-use App\Validation\ValidatorInterface;
+use App\Validation\SalleValidatorInterface;
 
 class CreerSalleBuilder
 {
@@ -49,7 +49,7 @@ class CreerSalleBuilder
         return $this;
     }
 
-    public function build(ValidatorInterface $validator): CreerSalleDTO
+    public function build(SalleValidatorInterface $validator): CreerSalleDTO
     {
         $data = [
             'nom'           => $this->nom,

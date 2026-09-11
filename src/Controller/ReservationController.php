@@ -2,10 +2,11 @@
 
 namespace App\Controller;
 
+use App\Core\SessionManager;
 use App\Service\CreerReservationService;
 use App\Service\AnnulerReservationService;
 use App\Service\ReservationQueryService;
-use App\Validation\ReservationValidator;
+use App\Validation\ReservationValidatorInterface;
 use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationInvalideException;
 use App\Exception\ReservationIntrouvableException;
@@ -19,7 +20,7 @@ class ReservationController extends AbstractController
         private ReservationQueryService $reservationQueryService,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
-        private ReservationValidator $validator,
+        private ReservationValidatorInterface $validator,        private SessionManager $session,
         ResponseRendererInterface $renderer
     ) {
         parent::__construct($renderer);
@@ -36,8 +37,8 @@ class ReservationController extends AbstractController
         $pagination = $this->reservationQueryService->rechercherEtPaginer($criteres, $page, 5);
         $salles = $this->reservationQueryService->listerSallesDisponibles();
 
-        $errors = $_SESSION['errors'] ?? [];
-        unset($_SESSION['errors']);
+        $errors = $this->session->get('errors', []);
+        $this->session->unset('errors');
 
         $this->renderView('reservation/index', [
             'title'        => 'Liste des réservations',
@@ -68,10 +69,11 @@ class ReservationController extends AbstractController
     public function create(): void
     {
         $salles = $this->reservationQueryService->listerSallesDisponibles();
-        $errors = $_SESSION['errors'] ?? [];
-        $old    = $_SESSION['old'] ?? [];
+        $errors = $this->session->get('errors', []);
+        $old    = $this->session->get('old', []);
 
-        unset($_SESSION['errors'], $_SESSION['old']);
+        $this->session->unset('errors');
+        $this->session->unset('old');
 
         $this->renderView('reservation/form', [
             'title'  => 'Nouvelle réservation',
@@ -95,8 +97,8 @@ class ReservationController extends AbstractController
         $validationResult = $this->validator->validate($data);
 
         if (!$validationResult->isValid()) {
-            $_SESSION['errors'] = $validationResult->errors();
-            $_SESSION['old']    = $data;
+            $this->session->set('errors', $validationResult->errors());
+            $this->session->set('old', $data);
             $this->redirect('/reservations/create');
         }
 
@@ -112,16 +114,16 @@ class ReservationController extends AbstractController
 
             $reservationId = $this->creerReservationService->creatReservation($dto);
 
-            $_SESSION['success'] = "Réservation #{$reservationId} créée avec succès !";
+            $this->session->set('success', "Réservation #{$reservationId} créée avec succès !");
             $this->redirect('/reservations');
         } catch (SalleIndisponibleException | ReservationInvalideException $e) {
-            $_SESSION['errors']['globale'] = $e->getMessage();
-            $_SESSION['old'] = $data;
+            $this->session->set('errors', ['globale' => $e->getMessage()]);
+            $this->session->set('old', $data);
             $this->redirect('/reservations/create');
         } catch (Exception $e) {
             error_log($e->getMessage());
-            $_SESSION['errors']['globale'] = 'Une erreur est survenue lors de la réservation.';
-            $_SESSION['old'] = $data;
+            $this->session->set('errors', ['globale' => 'Une erreur est survenue lors de la réservation.']);
+            $this->session->set('old', $data);
             $this->redirect('/reservations/create');
         }
     }
@@ -130,9 +132,9 @@ class ReservationController extends AbstractController
     {
         try {
             $this->annulerReservationService->annuler($id);
-            $_SESSION['success'] = "La réservation #{$id} a été annulée avec succès.";
+            $this->session->set('success', "La réservation #{$id} a été annulée avec succès.");
         } catch (ReservationIntrouvableException $e) {
-            $_SESSION['errors']['globale'] = $e->getMessage();
+            $this->session->set('errors', ['globale' => $e->getMessage()]);
         }
 
         $this->redirect('/reservations');
