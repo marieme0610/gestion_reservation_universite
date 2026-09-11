@@ -11,9 +11,9 @@ services:
       DB_DRIVER: mysql
       DB_HOST: db
       DB_PORT: "3306"
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${MYSQL_DATABASE}
+      DB_USERNAME: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
       RENDER_MODE: ${RENDER_MODE:-html}
     depends_on:
       db:
@@ -23,11 +23,8 @@ services:
 
   db:
     image: mysql:8.0
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_USER: ${DB_USERNAME}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    env_file:
+      - .env
     volumes:
       - mysql-data:/var/lib/mysql
     healthcheck:
@@ -39,8 +36,8 @@ services:
           "-h",
           "localhost",
           "-u",
-          "${DB_USERNAME}",
-          "-p${DB_PASSWORD}",
+          "${MYSQL_USER}",
+          "-p${MYSQL_PASSWORD}",
         ]
       interval: 5s
       timeout: 5s
@@ -52,8 +49,8 @@ services:
     image: phpmyadmin:5
     environment:
       PMA_HOST: db
-      PMA_USER: ${DB_USERNAME}
-      PMA_PASSWORD: ${DB_PASSWORD}
+      PMA_USER: ${MYSQL_USER}
+      PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${PHPMYADMIN_PORT:-8081}:80"
     depends_on:
@@ -67,4 +64,3 @@ volumes:
 
 networks:
   reservation-network:
-    driver: bridge

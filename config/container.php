@@ -33,6 +33,10 @@ use App\Validation\ReservationValidatorInterface;
 use App\Validation\ReservationValidator;
 use App\Service\AnnulerReservationServiceInterface;
 use App\Service\AnnulerReservationService;
+use App\Rendering\RenderModeResolver;
+use App\Middleware\RenderModeMiddleware;
+use Psr\Container\ContainerInterface;
+
 
 return [
 
@@ -45,10 +49,15 @@ return [
         autowire(FiltreParStatut::class),
     ],
 
+       'middlewares.public' => [
+        autowire(RenderModeMiddleware::class),
+    ],
     'middlewares.connecte' => [
+        autowire(RenderModeMiddleware::class),
         autowire(AuthMiddleware::class),
     ],
     'middlewares.admin' => [
+        autowire(RenderModeMiddleware::class),
         autowire(AuthMiddleware::class),
         autowire(AdminMiddleware::class),
     ],
@@ -82,8 +91,8 @@ return [
         });
     }),
 
-    ResponseRendererInterface::class => factory(function (): ResponseRendererInterface {
-        $mode = $_ENV['RENDER_MODE'] ?? 'html';
+       ResponseRendererInterface::class => factory(function (ContainerInterface $c): ResponseRendererInterface {
+        $mode = $c->get(RenderModeResolver::class)->getMode();
 
         return match ($mode) {
             'json'  => new JsonRenderer(),

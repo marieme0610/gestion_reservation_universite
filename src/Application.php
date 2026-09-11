@@ -46,11 +46,9 @@ final class Application
                     [$controllerClass, $method, $groupeMiddleware] = $routeInfo[1];
                     $vars = $routeInfo[2];
 
-                    if ($groupeMiddleware !== 'public') {
-                        $middlewares = $this->container->get('middlewares.' . $groupeMiddleware);
-                        foreach ($middlewares as $middleware) {
-                            $middleware->verifier();
-                        }
+                    $middlewares = $this->container->get('middlewares.' . $groupeMiddleware);
+                    foreach ($middlewares as $middleware) {
+                        $middleware->verifier();
                     }
 
                     $controller = $this->container->get($controllerClass);
