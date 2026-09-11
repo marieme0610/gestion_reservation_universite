@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+
 final class PaginationResult
 {
     public function __construct(
@@ -10,6 +12,16 @@ final class PaginationResult
         public readonly int $page,
         public readonly int $parPage
     ) {}
+
+    public static function depuisEloquent(LengthAwarePaginator $paginator): self
+    {
+        return new self(
+            $paginator->items(),
+            $paginator->total(),
+            $paginator->currentPage(),
+            $paginator->perPage()
+        );
+    }
 
     public function totalPages(): int
     {

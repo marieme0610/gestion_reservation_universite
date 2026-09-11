@@ -8,7 +8,7 @@ use App\Repository\Filtre\ReservationFiltreInterface;
 
 class ReservationRepository implements ReservationRepositoryInterface{
 
-    public function __construct(private array $filtres) {}
+    public function __construct(private array $filtres){}
 
     public function getAllReservation():array{
         
@@ -43,7 +43,6 @@ class ReservationRepository implements ReservationRepositoryInterface{
         ->exists();
 }
 
-
     public function rechercherEtPaginer(array $criteres, int $page, int $parPage): PaginationResult
     {
         $query = Reservation::query();
@@ -54,18 +53,9 @@ class ReservationRepository implements ReservationRepositoryInterface{
             }
         }
 
-        $total = (clone $query)->count();
+        $paginator = $query->orderBy('date_debut', 'desc')
+            ->paginate(perPage: $parPage, page: max(1, $page));
 
-        $page = max(1, $page);
-        $parPage = max(1, $parPage);
-
-        $items = $query->orderBy('date_debut', 'desc')
-            ->skip(($page - 1) * $parPage)
-            ->take($parPage)
-            ->get()
-            ->all();
-
-        return new PaginationResult($items, $total, $page, $parPage);
+        return PaginationResult::depuisEloquent($paginator);
     }
-
 }
