@@ -2,8 +2,7 @@
 
 namespace App\DTO;
 
-use App\Validation\ValidatorInterface;
-
+use App\Validation\ReservationValidatorInterface;
 
 class CreerReservationBuilder
 {
@@ -57,7 +56,7 @@ class CreerReservationBuilder
         return $this;
     }
 
-    public function build(ValidatorInterface $validator): CreerReservationDTO
+    public function build(ReservationValidatorInterface $validator): CreerReservationDTO
     {
         $data = [
             'salle_id'    => $this->salleId,

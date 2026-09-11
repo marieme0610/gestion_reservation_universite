@@ -1,7 +1,7 @@
 <?php
 
 namespace App\DTO;
-use App\Validation\ValidatorInterface;
+use App\Validation\SalleValidatorInterface;
 use App\Exception\ValidationException;
 readonly class CreerSalleDTO
 {
@@ -13,8 +13,7 @@ readonly class CreerSalleDTO
         public int $typeSalleId
     ) {}
 
-    public static function fromArray(ValidatorInterface $validator,array $data): self
-    {
+    public static function fromArray(SalleValidatorInterface $validator, array $data): self    {
          $validationResult = $validator->validate($data);
 
         if (!$validationResult->isValid()) {

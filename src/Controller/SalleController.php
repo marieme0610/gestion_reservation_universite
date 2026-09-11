@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Core\SessionManager;
 use App\Service\SalleService;
-use App\Validation\SalleValidator;
+use App\Validation\SalleValidatorInterface;
 use App\DTO\CreerSalleBuilder;
 use App\Rendering\ResponseRendererInterface;
 
@@ -12,8 +12,7 @@ class SalleController extends AbstractController
 {
     public function __construct(
         private SalleService $salleService,
-        private SalleValidator $validator,
-        private SessionManager $session,
+        private SalleValidatorInterface $validator,        private SessionManager $session,
         ResponseRendererInterface $renderer
     ) {
         parent::__construct($renderer);

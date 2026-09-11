@@ -6,7 +6,7 @@ use App\Core\SessionManager;
 use App\Service\CreerReservationService;
 use App\Service\AnnulerReservationService;
 use App\Service\ReservationQueryService;
-use App\Validation\ReservationValidator;
+use App\Validation\ReservationValidatorInterface;
 use App\Exception\SalleIndisponibleException;
 use App\Exception\ReservationInvalideException;
 use App\Exception\ReservationIntrouvableException;
@@ -20,8 +20,7 @@ class ReservationController extends AbstractController
         private ReservationQueryService $reservationQueryService,
         private CreerReservationService $creerReservationService,
         private AnnulerReservationService $annulerReservationService,
-        private ReservationValidator $validator,
-        private SessionManager $session,
+        private ReservationValidatorInterface $validator,        private SessionManager $session,
         ResponseRendererInterface $renderer
     ) {
         parent::__construct($renderer);
