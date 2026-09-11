@@ -31,6 +31,8 @@ use App\Validation\SalleValidatorInterface;
 use App\Validation\SalleValidator;
 use App\Validation\ReservationValidatorInterface;
 use App\Validation\ReservationValidator;
+use App\Service\AnnulerReservationServiceInterface;
+use App\Service\AnnulerReservationService;
 
 return [
 
@@ -67,6 +69,8 @@ return [
 
     SalleValidatorInterface::class => autowire(SalleValidator::class),
     ReservationValidatorInterface::class => autowire(ReservationValidator::class),
+
+        AnnulerReservationServiceInterface::class => autowire(AnnulerReservationService::class),
 
     CreerReservationService::class => autowire()
         ->constructorParameter('regles', get('reservation.regles')),

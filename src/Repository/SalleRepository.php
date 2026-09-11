@@ -37,18 +37,10 @@ class SalleRepository implements SalleRepositoryInterface
             }
         }
 
-        $total = (clone $query)->count();
+                $paginator = $query->orderBy('nom')
+            ->paginate(perPage: $parPage, page: max(1, $page));
 
-        $page = max(1, $page);
-        $parPage = max(1, $parPage);
-
-        $items = $query->orderBy('nom')
-            ->skip(($page - 1) * $parPage)
-            ->take($parPage)
-            ->get()
-            ->all();
-
-        return new PaginationResult($items, $total, $page, $parPage);
+        return PaginationResult::depuisEloquent($paginator);
    }
 
 }

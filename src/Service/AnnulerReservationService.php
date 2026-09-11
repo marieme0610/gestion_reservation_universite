@@ -5,12 +5,11 @@ namespace App\Service;
 use App\Repository\ReservationRepositoryInterface;
 use App\Exception\ReservationIntrouvableException;
 
-class AnnulerReservationService
+class AnnulerReservationService implements AnnulerReservationServiceInterface
 {
     public function __construct(
         private ReservationRepositoryInterface $reservationRepository
     ) {}
-
 
     public function annuler(int $reservationId): bool
     {

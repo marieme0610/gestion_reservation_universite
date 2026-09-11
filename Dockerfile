@@ -16,6 +16,8 @@ RUN composer install --no-dev --prefer-dist --no-interaction --no-progress --opt
 
 COPY . .
 
-EXPOSE 8000
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
+EXPOSE 8000
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

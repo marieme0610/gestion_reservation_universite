@@ -5,12 +5,18 @@ namespace App\Validation;
 use Respect\Validation\Validator as v;
 use Respect\Validation\Exceptions\NestedValidationException;
 
-
-class SalleValidator implements SalleValidatorInterface{
+class SalleValidator implements SalleValidatorInterface
+{
+    private array $messages = [
+        'nom'           => "Le nom de la salle doit contenir entre 2 et 100 caractères.",
+        'batiment'      => "Le nom du bâtiment doit contenir entre 2 et 100 caractères.",
+        'capacite'      => "La capacité doit être un nombre entre 1 et 1000.",
+        'type_salle_id' => "Veuillez sélectionner un type de salle valide.",
+        'active'        => "Le statut actif est invalide.",
+    ];
 
     public function validate(array $data): ValidationResult
     {
-
         $errors = [];
 
         $rules = [
@@ -25,7 +31,7 @@ class SalleValidator implements SalleValidatorInterface{
             try {
                 $rule->assert($data);
             } catch (NestedValidationException $e) {
-                $errors[$key] = "Le champ '{$key}' est invalide.";
+                $errors[$key] = $this->messages[$key] ?? "Le champ '{$key}' est invalide.";
             }
         }
 
