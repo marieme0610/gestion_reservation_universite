@@ -163,4 +163,10 @@ class SalleController extends AbstractController
         $this->salleService->modifier($salle, $dto);
         $this->redirect('/salles');
     }
+
+    public function healthCheck(): void
+    {
+        http_response_code(200);
+        echo 'OK';
+    }
 }

@@ -6,6 +6,7 @@ use App\Controller\ReservationController;
 use App\Controller\AuthController;
 
 return function (RouteCollector $r) {
+    $r->addRoute('GET', '/health', [SalleController::class, 'healthCheck', 'public']);
 
     $r->addRoute('GET', '/login', [AuthController::class, 'showLogin', 'public']);
     $r->addRoute('POST', '/login', [AuthController::class, 'login', 'public']);

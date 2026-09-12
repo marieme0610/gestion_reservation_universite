@@ -53,4 +53,17 @@ abstract class Migration
 
         return ((int) ($result[0]->aggregate ?? 0)) > 0;
     }
+
+        protected function hasForeign(string $table, string $foreignKeyName): bool
+    {
+        $connection = Capsule::connection();
+        $result = $connection->select(
+            'SELECT COUNT(1) AS aggregate FROM information_schema.table_constraints
+             WHERE table_schema = ? AND table_name = ? AND constraint_name = ?
+             AND constraint_type = \'FOREIGN KEY\'',
+            [$connection->getDatabaseName(), $table, $foreignKeyName]
+        );
+
+        return ((int) ($result[0]->aggregate ?? 0)) > 0;
+    }
 }
